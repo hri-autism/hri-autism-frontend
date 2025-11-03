@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useSession } from '../hooks/useSession'
 import { StatusBanner } from '../components/ui'
@@ -20,6 +20,8 @@ function humanize(option: string) {
     .join(' ')
 }
 
+const MAX_AUTO_RETRIES = 3
+
 function SessionSuccess() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const {
@@ -30,6 +32,30 @@ function SessionSuccess() {
   } = useSession()
   const [session, setSession] = useState<SessionDetail | null>(null)
   const [localError, setLocalError] = useState<string | null>(null)
+  const [isAutoRetrying, setIsAutoRetrying] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+
+  const fetchSession = useCallback(
+    async (targetId: string, { retry }: { retry: boolean }) => {
+      setLocalError(null)
+      clearError()
+
+      try {
+        const data = await getSession(targetId)
+        setSession(data)
+        setRetryCount(0)
+        setIsAutoRetrying(false)
+      } catch (err) {
+        if (retry) {
+          setRetryCount((prev) => prev + 1)
+        }
+        const message =
+          err instanceof Error ? err.message : 'Failed to load the session.'
+        setLocalError(message)
+      }
+    },
+    [clearError, getSession],
+  )
 
   useEffect(() => {
     if (!sessionId) {
@@ -38,29 +64,38 @@ function SessionSuccess() {
       return
     }
 
-    let cancelled = false
-    setLocalError(null)
     setSession(null)
-    clearError()
+    setLocalError(null)
+    setRetryCount(0)
+    setIsAutoRetrying(false)
 
-    getSession(sessionId)
-      .then((data) => {
-        if (!cancelled) {
-          setSession(data)
-        }
+    fetchSession(sessionId, { retry: false })
+      .catch(() => {
+        /* handled in fetchSession */
       })
-      .catch((err) => {
-        if (!cancelled) {
-          const message =
-            err instanceof Error ? err.message : 'Failed to load the session.'
-          setLocalError(message)
-        }
-      })
+  }, [fetchSession, sessionId])
 
-    return () => {
-      cancelled = true
+  useEffect(() => {
+    if (!session && sessionId && retryCount < MAX_AUTO_RETRIES) {
+      setIsAutoRetrying(true)
+      const timer = window.setTimeout(() => {
+        fetchSession(sessionId, { retry: true }).finally(() => {
+          setIsAutoRetrying(false)
+        })
+      }, 4000)
+      return () => window.clearTimeout(timer)
     }
-  }, [clearError, getSession, sessionId])
+    return undefined
+  }, [fetchSession, retryCount, session, sessionId])
+
+  const handleRefresh = useCallback(() => {
+    if (!sessionId) return
+    setIsAutoRetrying(false)
+    setRetryCount(0)
+    fetchSession(sessionId, { retry: false }).catch(() => {
+      /* handled within fetchSession */
+    })
+  }, [fetchSession, sessionId])
 
   const errorMessage = useMemo(
     () => localError ?? remoteError ?? null,
@@ -71,6 +106,8 @@ function SessionSuccess() {
     if (!session?.environment) return []
     return session.environment.split(',').map((token) => humanize(token.trim()))
   }, [session])
+
+  const refreshDisabled = isLoading || isAutoRetrying
 
   return (
     <main className="min-h-screen bg-white px-4 py-16">
@@ -90,6 +127,30 @@ function SessionSuccess() {
 
         {isLoading && !session && !errorMessage ? (
           <StatusBanner variant="loading">Loading prompt...</StatusBanner>
+        ) : null}
+
+        {isAutoRetrying && sessionId && retryCount < MAX_AUTO_RETRIES ? (
+          <StatusBanner variant="info">
+            Auto-refreshing prompt (attempt {retryCount + 1} of {MAX_AUTO_RETRIES})...
+          </StatusBanner>
+        ) : null}
+
+        {sessionId ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshDisabled}
+              className="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {refreshDisabled ? 'Refreshing...' : 'Refresh prompt'}
+            </button>
+            {retryCount > 0 && retryCount < MAX_AUTO_RETRIES ? (
+              <span className="text-xs text-slate-500">
+                Tried {retryCount} / {MAX_AUTO_RETRIES} automatic refreshes.
+              </span>
+            ) : null}
+          </div>
         ) : null}
 
         {session ? (
@@ -156,6 +217,12 @@ function SessionSuccess() {
               </div>
             </div>
           </section>
+        ) : null}
+
+        {!session && !isAutoRetrying && retryCount >= MAX_AUTO_RETRIES && sessionId ? (
+          <StatusBanner variant="info">
+            Automatic refresh attempts exhausted. Please try again manually.
+          </StatusBanner>
         ) : null}
 
         {!session && !isLoading && !errorMessage && sessionId ? (
