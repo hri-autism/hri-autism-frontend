@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { COMM_LEVELS, PERSONALITIES } from '../lib/constants'
 import { useChild } from '../hooks/useChild'
+import { FormError, Select, TextArea, TextInput } from '../components/form'
 
 type FormState = {
   nickname: string
@@ -23,6 +24,16 @@ const initialState: FormState = {
   interests_raw: '',
   target_skills_raw: '',
 }
+
+const COMM_LEVEL_OPTIONS = COMM_LEVELS.map((level) => ({
+  value: level,
+  label: level.charAt(0).toUpperCase() + level.slice(1),
+}))
+
+const PERSONALITY_OPTIONS = PERSONALITIES.map((item) => ({
+  value: item,
+  label: item.charAt(0).toUpperCase() + item.slice(1),
+}))
 
 function ChildNew() {
   const [form, setForm] = useState<FormState>(initialState)
@@ -113,6 +124,8 @@ function ChildNew() {
     )
   }, [form, isSubmitting])
 
+  const feedback = formError ?? error
+
   return (
     <main className="min-h-screen bg-white px-4 py-16">
       <div className="mx-auto max-w-3xl space-y-8">
@@ -133,150 +146,88 @@ function ChildNew() {
           </p>
         </header>
 
-        {(formError || error) && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {formError ?? error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-8">
+          <FormError>{feedback}</FormError>
+
           <section className="grid gap-6 md:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="nickname">
-                Nickname
-              </label>
-              <input
-                id="nickname"
-                name="nickname"
-                type="text"
-                value={form.nickname}
-                onChange={handleChange}
-                placeholder="e.g., Leo"
-                required
-                maxLength={100}
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-            </div>
+            <TextInput
+              label="Nickname"
+              name="nickname"
+              type="text"
+              value={form.nickname}
+              onChange={handleChange}
+              placeholder="e.g., Leo"
+              required
+              maxLength={100}
+              disabled={isSubmitting}
+            />
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="age">
-                Age (years)
-              </label>
-              <input
-                id="age"
-                name="age"
-                type="number"
-                min={0}
-                value={form.age}
-                onChange={handleChange}
-                placeholder="e.g., 6"
-                required
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-            </div>
+            <TextInput
+              label="Age (years)"
+              name="age"
+              type="number"
+              min={0}
+              value={form.age}
+              onChange={handleChange}
+              placeholder="e.g., 6"
+              required
+              disabled={isSubmitting}
+            />
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="comm_level">
-                Communication Level
-              </label>
-              <select
-                id="comm_level"
-                name="comm_level"
-                value={form.comm_level}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              >
-                <option value="" disabled hidden>
-                  Select an option
-                </option>
-                {COMM_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Communication Level"
+              name="comm_level"
+              value={form.comm_level}
+              onChange={handleChange}
+              placeholder="Select an option"
+              options={COMM_LEVEL_OPTIONS}
+              required
+              disabled={isSubmitting}
+            />
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="personality">
-                Personality
-              </label>
-              <select
-                id="personality"
-                name="personality"
-                value={form.personality}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              >
-                <option value="" disabled hidden>
-                  Select an option
-                </option>
-                {PERSONALITIES.map((item) => (
-                  <option key={item} value={item}>
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Personality"
+              name="personality"
+              value={form.personality}
+              onChange={handleChange}
+              placeholder="Select an option"
+              options={PERSONALITY_OPTIONS}
+              required
+              disabled={isSubmitting}
+            />
           </section>
 
           <section className="space-y-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="triggers_raw">
-                Sensitive Topics (triggers_raw)
-              </label>
-              <textarea
-                id="triggers_raw"
-                name="triggers_raw"
-                rows={4}
-                value={form.triggers_raw}
-                onChange={handleChange}
-                placeholder="e.g., Avoid hospital or doctor stories; keep the volume low."
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-              <p className="text-xs text-slate-500">
-                Describe sensitive topics in full sentences. The backend will extract up to seven keywords.
-              </p>
-            </div>
+            <TextArea
+              label="Sensitive Topics (triggers_raw)"
+              name="triggers_raw"
+              rows={4}
+              value={form.triggers_raw}
+              onChange={handleChange}
+              placeholder="e.g., Avoid hospital or doctor stories; keep the volume low."
+              hint="Describe sensitive topics in full sentences. The backend will extract up to seven keywords."
+              disabled={isSubmitting}
+            />
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="interests_raw">
-                Long-term Interests (interests_raw)
-              </label>
-              <textarea
-                id="interests_raw"
-                name="interests_raw"
-                rows={4}
-                value={form.interests_raw}
-                onChange={handleChange}
-                placeholder="e.g., Dinosaurs, puzzles, blue toys help them relax."
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-            </div>
+            <TextArea
+              label="Long-term Interests (interests_raw)"
+              name="interests_raw"
+              rows={4}
+              value={form.interests_raw}
+              onChange={handleChange}
+              placeholder="e.g., Dinosaurs, puzzles, blue toys help them relax."
+              disabled={isSubmitting}
+            />
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="target_skills_raw">
-                Target Skills (target_skills_raw)
-              </label>
-              <textarea
-                id="target_skills_raw"
-                name="target_skills_raw"
-                rows={4}
-                value={form.target_skills_raw}
-                onChange={handleChange}
-                placeholder="e.g., Practice asking for help, taking turns, sharing the toy car."
-                disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              />
-            </div>
+            <TextArea
+              label="Target Skills (target_skills_raw)"
+              name="target_skills_raw"
+              rows={4}
+              value={form.target_skills_raw}
+              onChange={handleChange}
+              placeholder="e.g., Practice asking for help, taking turns, sharing the toy car."
+              disabled={isSubmitting}
+            />
           </section>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

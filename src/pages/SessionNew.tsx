@@ -8,6 +8,7 @@ import {
   MOODS,
 } from '../lib/constants'
 import { useSession } from '../hooks/useSession'
+import { FormError, Select, TextArea } from '../components/form'
 
 type FormState = {
   mood: string
@@ -31,6 +32,26 @@ function humanize(option: string) {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ')
 }
+
+const MOOD_OPTIONS = MOODS.map((value) => ({
+  value,
+  label: humanize(value),
+}))
+
+const LOCATION_OPTIONS = ENVIRONMENT_LOCATIONS.map((value) => ({
+  value,
+  label: humanize(value),
+}))
+
+const NOISE_OPTIONS = ENVIRONMENT_NOISE.map((value) => ({
+  value,
+  label: humanize(value),
+}))
+
+const CROWD_OPTIONS = ENVIRONMENT_CROWD.map((value) => ({
+  value,
+  label: humanize(value),
+}))
 
 function SessionNew() {
   const [searchParams] = useSearchParams()
@@ -157,126 +178,62 @@ function SessionNew() {
 
         {childId && (
           <form onSubmit={handleSubmit} className="space-y-8">
-            {feedback && (
-              <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {feedback}
-              </div>
-            )}
+            <FormError>{feedback}</FormError>
 
             <section className="grid gap-6 md:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="mood">
-                  Mood
-                </label>
-                <select
-                  id="mood"
-                  name="mood"
-                  value={form.mood}
-                  onChange={handleChange}
-                  disabled={isSubmitting}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                >
-                  <option value="" disabled hidden>
-                    Select an option
-                  </option>
-                  {MOODS.map((mood) => (
-                    <option key={mood} value={mood}>
-                      {humanize(mood)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Mood"
+                name="mood"
+                value={form.mood}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={MOOD_OPTIONS}
+                disabled={isSubmitting}
+              />
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="location">
-                  Location
-                </label>
-                <select
-                  id="location"
-                  name="location"
-                  value={form.location}
-                  onChange={handleChange}
-                  disabled={isSubmitting}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                >
-                  <option value="" disabled hidden>
-                    Select an option
-                  </option>
-                  {ENVIRONMENT_LOCATIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {humanize(option)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Location"
+                name="location"
+                value={form.location}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={LOCATION_OPTIONS}
+                disabled={isSubmitting}
+              />
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="noise">
-                  Noise Level
-                </label>
-                <select
-                  id="noise"
-                  name="noise"
-                  value={form.noise}
-                  onChange={handleChange}
-                  disabled={isSubmitting}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                >
-                  <option value="" disabled hidden>
-                    Select an option
-                  </option>
-                  {ENVIRONMENT_NOISE.map((option) => (
-                    <option key={option} value={option}>
-                      {humanize(option)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Noise Level"
+                name="noise"
+                value={form.noise}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={NOISE_OPTIONS}
+                disabled={isSubmitting}
+              />
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="crowd">
-                  Crowd Density
-                </label>
-                <select
-                  id="crowd"
-                  name="crowd"
-                  value={form.crowd}
-                  onChange={handleChange}
-                  disabled={isSubmitting}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                >
-                  <option value="" disabled hidden>
-                    Select an option
-                  </option>
-                  {ENVIRONMENT_CROWD.map((option) => (
-                    <option key={option} value={option}>
-                      {humanize(option)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Crowd Density"
+                name="crowd"
+                value={form.crowd}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={CROWD_OPTIONS}
+                disabled={isSubmitting}
+              />
             </section>
 
             <section className="space-y-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="situation">
-                  Situation
-                </label>
-                <textarea
-                  id="situation"
-                  name="situation"
-                  rows={6}
-                  maxLength={800}
-                  value={form.situation}
-                  onChange={handleChange}
-                  placeholder="Describe today's context in full sentences (<= 800 characters)."
-                  disabled={isSubmitting}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                />
-                <p className="text-xs text-slate-500">
-                  Focus on temporary context, energy level, recent events, or anything the robot should know today.
-                </p>
-              </div>
+              <TextArea
+                label="Situation"
+                name="situation"
+                rows={6}
+                maxLength={800}
+                value={form.situation}
+                onChange={handleChange}
+                placeholder="Describe today's context in full sentences (<= 800 characters)."
+                hint="Focus on temporary context, energy level, recent events, or anything the robot should know today."
+                disabled={isSubmitting}
+              />
             </section>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
