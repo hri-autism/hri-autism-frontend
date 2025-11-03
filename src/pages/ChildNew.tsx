@@ -6,6 +6,7 @@ import { useChild } from '../hooks/useChild'
 import { Select, TextArea, TextInput } from '../components/form'
 import {
   Button,
+  LoadingOverlay,
   FormSection,
   PageContainer,
   SectionHeader,
@@ -185,11 +186,9 @@ function ChildNew() {
         }
       />
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="relative space-y-8">
         {isSubmitting ? (
-          <StatusBanner variant="loading">
-            Creating child profile...
-          </StatusBanner>
+          <LoadingOverlay label="Creating child profile..." />
         ) : feedback ? (
           <StatusBanner variant="error">{feedback}</StatusBanner>
         ) : null}

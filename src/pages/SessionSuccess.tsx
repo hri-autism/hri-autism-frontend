@@ -7,6 +7,7 @@ import {
   PageContainer,
   SectionHeader,
   StatusBanner,
+  Tag,
   buttonClasses,
 } from '../components/ui'
 
@@ -187,21 +188,16 @@ function SessionSuccess() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-slate-500">
-                environment
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {environmentChips.map((chip) => (
-                  <span
-                    key={chip}
-                    className="inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700"
-                  >
-                    {chip}
-                  </span>
-                ))}
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-slate-500">
+                  environment
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {environmentChips.map((chip) => (
+                    <Tag key={chip}>{chip}</Tag>
+                  ))}
+                </div>
               </div>
-            </div>
 
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-slate-500">

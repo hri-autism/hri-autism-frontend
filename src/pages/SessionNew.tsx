@@ -12,7 +12,9 @@ import { Select, TextArea } from '../components/form'
 import {
   Button,
   Card,
+  EmptyState,
   FormSection,
+  LoadingOverlay,
   PageContainer,
   SectionHeader,
   StatusBanner,
@@ -197,34 +199,36 @@ function SessionNew() {
         title="Selected child"
         description="Sessions are tied to an existing child profile."
       >
-        <div className="space-y-3 text-sm text-slate-700">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">
-              child_id
-            </p>
-            <p className="font-mono text-base text-slate-900">
-              {childId || 'Not provided'}
-            </p>
+        {childId ? (
+          <div className="space-y-3 text-sm text-slate-700">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                child_id
+              </p>
+              <p className="font-mono text-base text-slate-900 break-words">
+                {childId}
+              </p>
+            </div>
           </div>
-          {!childId && (
-            <p>
-              Please{' '}
-              <Link
-                to="/child/new"
-                className="font-semibold text-blue-600 hover:text-blue-500"
-              >
-                create a child profile
-              </Link>{' '}
-              before starting a session.
-            </p>
-          )}
-        </div>
+        ) : (
+          <EmptyState
+            title="No child selected"
+            description="Create a child profile first so we can attach the daily session to the right person."
+            actions={[
+              {
+                label: 'Create child profile',
+                href: '/child/new',
+                variant: 'primary',
+              },
+            ]}
+          />
+        )}
       </Card>
 
       {childId && (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="relative space-y-8">
           {isSubmitting ? (
-            <StatusBanner variant="loading">Generating prompt...</StatusBanner>
+            <LoadingOverlay label="Generating prompt..." />
           ) : feedback ? (
             <StatusBanner variant="error">{feedback}</StatusBanner>
           ) : null}
