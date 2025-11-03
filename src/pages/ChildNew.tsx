@@ -15,6 +15,8 @@ type FormState = {
   target_skills_raw: string
 }
 
+type FieldErrors = Partial<Record<keyof FormState, string>>
+
 const initialState: FormState = {
   nickname: '',
   age: '',
@@ -37,6 +39,7 @@ const PERSONALITY_OPTIONS = PERSONALITIES.map((item) => ({
 
 function ChildNew() {
   const [form, setForm] = useState<FormState>(initialState)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const { createChild, isSubmitting, error, clearError } = useChild()
   const navigate = useNavigate()
@@ -52,6 +55,14 @@ function ChildNew() {
         ...prev,
         [field]: event.target.value,
       }))
+      setFieldErrors((prev) => {
+        if (!prev[field]) {
+          return prev
+        }
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
     },
     [],
   )
@@ -59,30 +70,52 @@ function ChildNew() {
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault()
-      setFormError(null)
       clearError()
+
+      const newErrors: FieldErrors = {}
 
       const trimmedNickname = form.nickname.trim()
       if (!trimmedNickname) {
-        setFormError('Nickname is required')
-        return
+        newErrors.nickname = 'Nickname is required'
+      } else if (trimmedNickname.length > 100) {
+        newErrors.nickname = 'Nickname must be 100 characters or less'
       }
 
       const parsedAge = Number(form.age)
-      if (!Number.isFinite(parsedAge) || parsedAge < 0) {
-        setFormError('Age must be a non-negative number')
-        return
+      if (!Number.isFinite(parsedAge) || !Number.isInteger(parsedAge)) {
+        newErrors.age = 'Age must be a whole number'
+      } else if (parsedAge < 0 || parsedAge > 18) {
+        newErrors.age = 'Age must be between 0 and 18'
       }
 
       if (!form.comm_level) {
-        setFormError('Communication level is required')
-        return
+        newErrors.comm_level = 'Select a communication level'
       }
 
       if (!form.personality) {
-        setFormError('Personality is required')
+        newErrors.personality = 'Select a personality'
+      }
+
+      if (form.triggers_raw && form.triggers_raw.length > 800) {
+        newErrors.triggers_raw = 'Sensitive topics must be 800 characters or less'
+      }
+
+      if (form.interests_raw && form.interests_raw.length > 800) {
+        newErrors.interests_raw = 'Long-term interests must be 800 characters or less'
+      }
+
+      if (form.target_skills_raw && form.target_skills_raw.length > 800) {
+        newErrors.target_skills_raw = 'Target skills must be 800 characters or less'
+      }
+
+      if (Object.keys(newErrors).length > 0) {
+        setFieldErrors(newErrors)
+        setFormError('Please correct the highlighted fields.')
         return
       }
+
+      setFieldErrors({})
+      setFormError(null)
 
       try {
         const child = await createChild({
@@ -110,6 +143,7 @@ function ChildNew() {
 
   const handleReset = useCallback(() => {
     setForm(initialState)
+    setFieldErrors({})
     setFormError(null)
     clearError()
   }, [clearError])
@@ -120,9 +154,10 @@ function ChildNew() {
       !form.nickname.trim() ||
       !form.age ||
       !form.comm_level ||
-      !form.personality
+      !form.personality ||
+      Object.keys(fieldErrors).length > 0
     )
-  }, [form, isSubmitting])
+  }, [fieldErrors, form, isSubmitting])
 
   const feedback = formError ?? error
 
@@ -160,6 +195,7 @@ function ChildNew() {
               required
               maxLength={100}
               disabled={isSubmitting}
+              error={fieldErrors.nickname ?? null}
             />
 
             <TextInput
@@ -172,6 +208,7 @@ function ChildNew() {
               placeholder="e.g., 6"
               required
               disabled={isSubmitting}
+              error={fieldErrors.age ?? null}
             />
 
             <Select
@@ -183,6 +220,7 @@ function ChildNew() {
               options={COMM_LEVEL_OPTIONS}
               required
               disabled={isSubmitting}
+              error={fieldErrors.comm_level ?? null}
             />
 
             <Select
@@ -194,6 +232,7 @@ function ChildNew() {
               options={PERSONALITY_OPTIONS}
               required
               disabled={isSubmitting}
+              error={fieldErrors.personality ?? null}
             />
           </section>
 
@@ -207,6 +246,8 @@ function ChildNew() {
               placeholder="e.g., Avoid hospital or doctor stories; keep the volume low."
               hint="Describe sensitive topics in full sentences. The backend will extract up to seven keywords."
               disabled={isSubmitting}
+              maxLength={800}
+              error={fieldErrors.triggers_raw ?? null}
             />
 
             <TextArea
@@ -217,6 +258,8 @@ function ChildNew() {
               onChange={handleChange}
               placeholder="e.g., Dinosaurs, puzzles, blue toys help them relax."
               disabled={isSubmitting}
+              maxLength={800}
+              error={fieldErrors.interests_raw ?? null}
             />
 
             <TextArea
@@ -227,6 +270,8 @@ function ChildNew() {
               onChange={handleChange}
               placeholder="e.g., Practice asking for help, taking turns, sharing the toy car."
               disabled={isSubmitting}
+              maxLength={800}
+              error={fieldErrors.target_skills_raw ?? null}
             />
           </section>
 

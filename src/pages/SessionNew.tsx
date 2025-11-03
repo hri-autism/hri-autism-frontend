@@ -18,6 +18,8 @@ type FormState = {
   situation: string
 }
 
+type FieldErrors = Partial<Record<keyof FormState, string>>
+
 const initialState: FormState = {
   mood: '',
   location: '',
@@ -58,6 +60,7 @@ function SessionNew() {
   const childId = searchParams.get('child_id')?.trim() ?? ''
 
   const [form, setForm] = useState<FormState>(initialState)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const { createSession, isSubmitting, error, clearError } = useSession()
   const navigate = useNavigate()
@@ -73,6 +76,14 @@ function SessionNew() {
         ...prev,
         [field]: event.target.value,
       }))
+      setFieldErrors((prev) => {
+        if (!prev[field]) {
+          return prev
+        }
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
     },
     [],
   )
@@ -80,35 +91,56 @@ function SessionNew() {
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault()
-      setFormError(null)
       clearError()
 
       if (!childId) {
+        setFieldErrors({})
         setFormError('Missing child_id. Please create a child profile first.')
         return
       }
 
+      const newErrors: FieldErrors = {}
+
       if (!form.mood) {
-        setFormError('Mood is required')
+        newErrors.mood = 'Select the child\'s current mood'
+      }
+
+      if (!form.location) {
+        newErrors.location = 'Select a location context'
+      }
+
+      if (!form.noise) {
+        newErrors.noise = 'Select the noise level'
+      }
+
+      if (!form.crowd) {
+        newErrors.crowd = 'Select the crowd density'
+      }
+
+      const trimmedSituation = form.situation.trim()
+      if (!trimmedSituation) {
+        newErrors.situation = 'Situation detail is required'
+      } else if (trimmedSituation.length < 20) {
+        newErrors.situation = 'Please provide at least 20 characters so the robot has enough context'
+      } else if (trimmedSituation.length > 800) {
+        newErrors.situation = 'Situation must be 800 characters or less'
+      }
+
+      if (Object.keys(newErrors).length > 0) {
+        setFieldErrors(newErrors)
+        setFormError('Please correct the highlighted fields.')
         return
       }
 
-      if (!form.location || !form.noise || !form.crowd) {
-        setFormError('Environment selections are required')
-        return
-      }
-
-      if (!form.situation.trim()) {
-        setFormError('Situation detail is required')
-        return
-      }
+      setFieldErrors({})
+      setFormError(null)
 
       try {
         const session = await createSession({
           child_id: childId,
           mood: form.mood,
           environment: [form.location, form.noise, form.crowd].join(','),
-          situation: form.situation.trim(),
+          situation: trimmedSituation,
         })
         navigate(`/session/success/${session.session_id}`)
       } catch (submissionError) {
@@ -125,6 +157,7 @@ function SessionNew() {
 
   const handleReset = useCallback(() => {
     setForm(initialState)
+    setFieldErrors({})
     setFormError(null)
     clearError()
   }, [clearError])
@@ -137,9 +170,10 @@ function SessionNew() {
       !form.location ||
       !form.noise ||
       !form.crowd ||
-      !form.situation.trim()
+      !form.situation.trim() ||
+      Object.keys(fieldErrors).length > 0
     )
-  }, [childId, form, isSubmitting])
+  }, [childId, fieldErrors, form, isSubmitting])
 
   const feedback = formError ?? error
 
@@ -183,58 +217,63 @@ function SessionNew() {
             <section className="grid gap-6 md:grid-cols-2">
               <Select
                 label="Mood"
-                name="mood"
-                value={form.mood}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={MOOD_OPTIONS}
-                disabled={isSubmitting}
-              />
+              name="mood"
+              value={form.mood}
+              onChange={handleChange}
+              placeholder="Select an option"
+              options={MOOD_OPTIONS}
+              disabled={isSubmitting}
+              error={fieldErrors.mood ?? null}
+            />
 
-              <Select
-                label="Location"
-                name="location"
-                value={form.location}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={LOCATION_OPTIONS}
-                disabled={isSubmitting}
-              />
+            <Select
+              label="Location"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="Select an option"
+              options={LOCATION_OPTIONS}
+              disabled={isSubmitting}
+              error={fieldErrors.location ?? null}
+            />
 
-              <Select
-                label="Noise Level"
-                name="noise"
-                value={form.noise}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={NOISE_OPTIONS}
-                disabled={isSubmitting}
-              />
+            <Select
+              label="Noise Level"
+              name="noise"
+              value={form.noise}
+              onChange={handleChange}
+              placeholder="Select an option"
+              options={NOISE_OPTIONS}
+              disabled={isSubmitting}
+              error={fieldErrors.noise ?? null}
+            />
 
-              <Select
-                label="Crowd Density"
-                name="crowd"
-                value={form.crowd}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={CROWD_OPTIONS}
-                disabled={isSubmitting}
-              />
-            </section>
+            <Select
+              label="Crowd Density"
+              name="crowd"
+              value={form.crowd}
+              onChange={handleChange}
+              placeholder="Select an option"
+              options={CROWD_OPTIONS}
+              disabled={isSubmitting}
+              error={fieldErrors.crowd ?? null}
+            />
+          </section>
 
-            <section className="space-y-6">
-              <TextArea
+          <section className="space-y-6">
+            <TextArea
                 label="Situation"
                 name="situation"
-                rows={6}
-                maxLength={800}
-                value={form.situation}
-                onChange={handleChange}
-                placeholder="Describe today's context in full sentences (<= 800 characters)."
-                hint="Focus on temporary context, energy level, recent events, or anything the robot should know today."
-                disabled={isSubmitting}
-              />
-            </section>
+              rows={6}
+              maxLength={800}
+              value={form.situation}
+              onChange={handleChange}
+              placeholder="Describe today's context in full sentences (<= 800 characters)."
+              hint="Focus on temporary context, energy level, recent events, or anything the robot should know today."
+              disabled={isSubmitting}
+              error={fieldErrors.situation ?? null}
+            />
+          </section>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <button
