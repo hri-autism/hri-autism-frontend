@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useSession } from '../hooks/useSession'
+import { StatusBanner } from '../components/ui'
 
 type SessionDetail = {
   session_id: string
@@ -83,17 +84,13 @@ function SessionSuccess() {
           </p>
         </header>
 
-        {errorMessage && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {errorMessage}
-          </div>
-        )}
+        {errorMessage ? (
+          <StatusBanner variant="error">{errorMessage}</StatusBanner>
+        ) : null}
 
-        {isLoading && !session && !errorMessage && (
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-            Loading prompt...
-          </div>
-        )}
+        {isLoading && !session && !errorMessage ? (
+          <StatusBanner variant="loading">Loading prompt...</StatusBanner>
+        ) : null}
 
         {session ? (
           <section className="space-y-6">
@@ -161,17 +158,17 @@ function SessionSuccess() {
           </section>
         ) : null}
 
-        {!session && !isLoading && !errorMessage && sessionId && (
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        {!session && !isLoading && !errorMessage && sessionId ? (
+          <StatusBanner variant="info">
             Prompt not available yet. Try refreshing in a moment.
-          </div>
-        )}
+          </StatusBanner>
+        ) : null}
 
-        {!sessionId && (
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        {!sessionId ? (
+          <StatusBanner variant="info">
             Missing session information. Please start a new session below.
-          </div>
-        )}
+          </StatusBanner>
+        ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link

@@ -3,7 +3,8 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { COMM_LEVELS, PERSONALITIES } from '../lib/constants'
 import { useChild } from '../hooks/useChild'
-import { FormError, Select, TextArea, TextInput } from '../components/form'
+import { Select, TextArea, TextInput } from '../components/form'
+import { StatusBanner } from '../components/ui'
 
 type FormState = {
   nickname: string
@@ -182,7 +183,13 @@ function ChildNew() {
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <FormError>{feedback}</FormError>
+          {isSubmitting ? (
+            <StatusBanner variant="loading">
+              Creating child profile...
+            </StatusBanner>
+          ) : feedback ? (
+            <StatusBanner variant="error">{feedback}</StatusBanner>
+          ) : null}
 
           <section className="grid gap-6 md:grid-cols-2">
             <TextInput

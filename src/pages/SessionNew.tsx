@@ -8,7 +8,8 @@ import {
   MOODS,
 } from '../lib/constants'
 import { useSession } from '../hooks/useSession'
-import { FormError, Select, TextArea } from '../components/form'
+import { Select, TextArea } from '../components/form'
+import { StatusBanner } from '../components/ui'
 
 type FormState = {
   mood: string
@@ -212,7 +213,13 @@ function SessionNew() {
 
         {childId && (
           <form onSubmit={handleSubmit} className="space-y-8">
-            <FormError>{feedback}</FormError>
+            {isSubmitting ? (
+              <StatusBanner variant="loading">
+                Generating prompt...
+              </StatusBanner>
+            ) : feedback ? (
+              <StatusBanner variant="error">{feedback}</StatusBanner>
+            ) : null}
 
             <section className="grid gap-6 md:grid-cols-2">
               <Select
