@@ -4,7 +4,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { COMM_LEVELS, PERSONALITIES } from '../lib/constants'
 import { useChild } from '../hooks/useChild'
 import { Select, TextArea, TextInput } from '../components/form'
-import { StatusBanner } from '../components/ui'
+import {
+  Button,
+  FormSection,
+  PageContainer,
+  SectionHeader,
+  StatusBanner,
+  buttonClasses,
+} from '../components/ui'
 
 type FormState = {
   nickname: string
@@ -163,35 +170,35 @@ function ChildNew() {
   const feedback = formError ?? error
 
   return (
-    <main className="min-h-screen bg-white px-4 py-16">
-      <div className="mx-auto max-w-3xl space-y-8">
-        <header className="space-y-3">
-          <h1 className="text-3xl font-semibold text-slate-900">
-            Create Child Profile
-          </h1>
-          <p className="text-slate-600">
+    <PageContainer>
+      <SectionHeader
+        title="Create Child Profile"
+        description={
+          <>
             Provide the child&apos;s baseline information to generate a unique{' '}
             <code className="mx-1 rounded bg-slate-100 px-1 py-0.5 text-sm">
               child_id
             </code>
-            . After submission the app redirects to
-            <code className="mx-1 rounded bg-slate-100 px-1 py-0.5 text-sm">
-              /session/new?child_id=...
-            </code>
-            to continue the daily session flow.
-          </p>
-        </header>
+            . After submission you&apos;ll jump directly to the daily session
+            form.
+          </>
+        }
+      />
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {isSubmitting ? (
-            <StatusBanner variant="loading">
-              Creating child profile...
-            </StatusBanner>
-          ) : feedback ? (
-            <StatusBanner variant="error">{feedback}</StatusBanner>
-          ) : null}
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {isSubmitting ? (
+          <StatusBanner variant="loading">
+            Creating child profile...
+          </StatusBanner>
+        ) : feedback ? (
+          <StatusBanner variant="error">{feedback}</StatusBanner>
+        ) : null}
 
-          <section className="grid gap-6 md:grid-cols-2">
+        <FormSection
+          title="Child basics"
+          description="Nickname, age, communication level and personality help tailor the robot's tone."
+        >
+          <div className="grid gap-6 md:grid-cols-2">
             <TextInput
               label="Nickname"
               name="nickname"
@@ -241,9 +248,14 @@ function ChildNew() {
               disabled={isSubmitting}
               error={fieldErrors.personality ?? null}
             />
-          </section>
+          </div>
+        </FormSection>
 
-          <section className="space-y-6">
+        <FormSection
+          title="Long-form context (optional)"
+          description="These backups help regenerate prompts if keywords ever need to be refreshed."
+        >
+          <div className="space-y-6">
             <TextArea
               label="Sensitive Topics (triggers_raw)"
               name="triggers_raw"
@@ -280,34 +292,35 @@ function ChildNew() {
               maxLength={800}
               error={fieldErrors.target_skills_raw ?? null}
             />
-          </section>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              type="submit"
-              disabled={disableSubmit}
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white shadow transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300"
-            >
-              {isSubmitting ? 'Submitting...' : 'Create Profile'}
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              disabled={isSubmitting}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-3 text-base font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Reset
-            </button>
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center text-base font-semibold text-blue-600 hover:text-blue-500"
-            >
-              Cancel and return home
-            </Link>
           </div>
-        </form>
-      </div>
-    </main>
+        </FormSection>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button
+            type="submit"
+            variant="primary"
+            loading={isSubmitting}
+            disabled={disableSubmit}
+          >
+            Create Profile
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleReset}
+            disabled={isSubmitting}
+          >
+            Reset
+          </Button>
+          <Link
+            to="/"
+            className={buttonClasses('ghost')}
+          >
+            Cancel and return home
+          </Link>
+        </div>
+      </form>
+    </PageContainer>
   )
 }
 

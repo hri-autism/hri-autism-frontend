@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Spinner } from './Spinner'
 
 type StatusVariant = 'info' | 'success' | 'error' | 'loading'
 
@@ -38,7 +39,10 @@ export function StatusBanner({
       role={variant === 'loading' ? 'status' : variant === 'error' ? 'alert' : 'status'}
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
     >
-      <span className="font-semibold">{variantLabels[variant]}</span>
+      <span className="flex items-center gap-2 font-semibold">
+        {variant === 'loading' ? <Spinner size="sm" /> : null}
+        {variantLabels[variant]}
+      </span>
       <span>{children}</span>
     </div>
   )

@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useSession } from '../hooks/useSession'
-import { StatusBanner } from '../components/ui'
+import {
+  Button,
+  Card,
+  PageContainer,
+  SectionHeader,
+  StatusBanner,
+  buttonClasses,
+} from '../components/ui'
 
 type SessionDetail = {
   session_id: string
@@ -110,149 +117,147 @@ function SessionSuccess() {
   const refreshDisabled = isLoading || isAutoRetrying
 
   return (
-    <main className="min-h-screen bg-white px-4 py-16">
-      <div className="mx-auto max-w-3xl space-y-8">
-        <header className="space-y-3">
-          <h1 className="text-3xl font-semibold text-slate-900">
-            Session Prompt Ready
-          </h1>
-          <p className="text-slate-600">
-            Review the generated prompt below. It stays read-only so the backend and Google Sheets remain consistent.
-          </p>
-        </header>
+    <PageContainer>
+      <SectionHeader
+        title="Session Prompt Ready"
+        description="Review the generated prompt below. It stays read-only so the backend and Google Sheets remain consistent."
+      />
 
-        {errorMessage ? (
-          <StatusBanner variant="error">{errorMessage}</StatusBanner>
-        ) : null}
+      {errorMessage ? (
+        <StatusBanner variant="error">{errorMessage}</StatusBanner>
+      ) : null}
 
-        {isLoading && !session && !errorMessage ? (
-          <StatusBanner variant="loading">Loading prompt...</StatusBanner>
-        ) : null}
+      {isLoading && !session && !errorMessage ? (
+        <StatusBanner variant="loading">Loading prompt...</StatusBanner>
+      ) : null}
 
-        {isAutoRetrying && sessionId && retryCount < MAX_AUTO_RETRIES ? (
-          <StatusBanner variant="info">
-            Auto-refreshing prompt (attempt {retryCount + 1} of {MAX_AUTO_RETRIES})...
-          </StatusBanner>
-        ) : null}
+      {isAutoRetrying && sessionId && retryCount < MAX_AUTO_RETRIES ? (
+        <StatusBanner variant="info">
+          Auto-refreshing prompt (attempt {retryCount + 1} of {MAX_AUTO_RETRIES})...
+        </StatusBanner>
+      ) : null}
 
-        {sessionId ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={handleRefresh}
-              disabled={refreshDisabled}
-              className="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {refreshDisabled ? 'Refreshing...' : 'Refresh prompt'}
-            </button>
-            {retryCount > 0 && retryCount < MAX_AUTO_RETRIES ? (
-              <span className="text-xs text-slate-500">
-                Tried {retryCount} / {MAX_AUTO_RETRIES} automatic refreshes.
-              </span>
-            ) : null}
-          </div>
-        ) : null}
+      {sessionId ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleRefresh}
+            disabled={refreshDisabled}
+            loading={refreshDisabled && !isAutoRetrying}
+          >
+            {refreshDisabled ? 'Refreshing...' : 'Refresh prompt'}
+          </Button>
+          {retryCount > 0 && retryCount < MAX_AUTO_RETRIES ? (
+            <span className="text-xs text-slate-500">
+              Tried {retryCount} / {MAX_AUTO_RETRIES} automatic refreshes.
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
-        {session ? (
-          <section className="space-y-6">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 space-y-4">
+      {session ? (
+        <Card>
+          <div className="space-y-6">
+            <div>
+              <p className="text-sm uppercase tracking-wide text-slate-500">
+                session_id
+              </p>
+              <p className="font-mono text-base text-slate-900 break-words">
+                {session.session_id}
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <p className="text-sm uppercase tracking-wide text-slate-500">
-                  session_id
-                </p>
-                <p className="font-mono text-base text-slate-900 break-words">
-                  {session.session_id}
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    child_id
-                  </p>
-                  <p className="font-mono text-sm text-slate-800 break-words">
-                    {session.child_id}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    mood
-                  </p>
-                  <p className="text-sm text-slate-800">{humanize(session.mood)}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
                 <p className="text-xs uppercase tracking-wide text-slate-500">
-                  environment
+                  child_id
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {environmentChips.map((chip) => (
-                    <span
-                      key={chip}
-                      className="inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700"
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  situation
-                </p>
-                <p className="text-sm text-slate-800 whitespace-pre-wrap">
-                  {session.situation}
+                <p className="font-mono text-sm text-slate-800 break-words">
+                  {session.child_id}
                 </p>
               </div>
-
-              <div className="space-y-2">
+              <div>
                 <p className="text-xs uppercase tracking-wide text-slate-500">
-                  prompt
+                  mood
                 </p>
-                <div className="rounded-md border border-slate-300 bg-white p-4 text-sm text-slate-800 whitespace-pre-wrap">
-                  {session.prompt}
-                </div>
+                <p className="text-sm text-slate-800">
+                  {humanize(session.mood)}
+                </p>
               </div>
             </div>
-          </section>
-        ) : null}
 
-        {!session && !isAutoRetrying && retryCount >= MAX_AUTO_RETRIES && sessionId ? (
-          <StatusBanner variant="info">
-            Automatic refresh attempts exhausted. Please try again manually.
-          </StatusBanner>
-        ) : null}
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                environment
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {environmentChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs font-medium text-slate-700"
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-        {!session && !isLoading && !errorMessage && sessionId ? (
-          <StatusBanner variant="info">
-            Prompt not available yet. Try refreshing in a moment.
-          </StatusBanner>
-        ) : null}
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                situation
+              </p>
+              <p className="text-sm text-slate-800 whitespace-pre-wrap">
+                {session.situation}
+              </p>
+            </div>
 
-        {!sessionId ? (
-          <StatusBanner variant="info">
-            Missing session information. Please start a new session below.
-          </StatusBanner>
-        ) : null}
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                prompt
+              </p>
+              <div className="rounded-xl border border-slate-300 bg-white p-4 text-sm text-slate-800 whitespace-pre-wrap">
+                {session.prompt}
+              </div>
+            </div>
+          </div>
+        </Card>
+      ) : null}
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            to={session ? `/session/new?child_id=${encodeURIComponent(session.child_id)}` : '/session/new'}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white shadow hover:bg-blue-500 transition"
-          >
-            Start another session
-          </Link>
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-3 text-base font-semibold text-slate-700 hover:border-slate-400 hover:bg-white transition"
-          >
-            Back to home
-          </Link>
-        </div>
+      {!session && !isAutoRetrying && retryCount >= MAX_AUTO_RETRIES && sessionId ? (
+        <StatusBanner variant="info">
+          Automatic refresh attempts exhausted. Please try again manually.
+        </StatusBanner>
+      ) : null}
+
+      {!session && !isLoading && !errorMessage && sessionId ? (
+        <StatusBanner variant="info">
+          Prompt not available yet. Try refreshing in a moment.
+        </StatusBanner>
+      ) : null}
+
+      {!sessionId ? (
+        <StatusBanner variant="info">
+          Missing session information. Please start a new session below.
+        </StatusBanner>
+      ) : null}
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Link
+          to={
+            session
+              ? `/session/new?child_id=${encodeURIComponent(session.child_id)}`
+              : '/session/new'
+          }
+          className={buttonClasses('primary')}
+        >
+          Start another session
+        </Link>
+        <Link to="/" className={buttonClasses('secondary')}>
+          Back to home
+        </Link>
       </div>
-    </main>
+    </PageContainer>
   )
 }
 

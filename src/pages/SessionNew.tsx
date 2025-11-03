@@ -9,7 +9,15 @@ import {
 } from '../lib/constants'
 import { useSession } from '../hooks/useSession'
 import { Select, TextArea } from '../components/form'
-import { StatusBanner } from '../components/ui'
+import {
+  Button,
+  Card,
+  FormSection,
+  PageContainer,
+  SectionHeader,
+  StatusBanner,
+  buttonClasses,
+} from '../components/ui'
 
 type FormState = {
   mood: string
@@ -179,98 +187,106 @@ function SessionNew() {
   const feedback = formError ?? error
 
   return (
-    <main className="min-h-screen bg-white px-4 py-16">
-      <div className="mx-auto max-w-3xl space-y-8">
-        <header className="space-y-3">
-          <h1 className="text-3xl font-semibold text-slate-900">
-            Create Daily Session
-          </h1>
-          <p className="text-slate-600">
-            Submit the child&apos;s current mood, environment, and situation to generate a tailored prompt.
-          </p>
-        </header>
+    <PageContainer>
+      <SectionHeader
+        title="Create Daily Session"
+        description="Provide the child’s current mood, environment, and situation so the backend can generate an actionable prompt."
+      />
 
-        <section className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-slate-700">
-          <p className="text-sm uppercase tracking-wide text-slate-500">
-            child_id
-          </p>
-          <p className="font-mono text-base text-slate-900">
-            {childId || 'Not provided'}
-          </p>
+      <Card
+        title="Selected child"
+        description="Sessions are tied to an existing child profile."
+      >
+        <div className="space-y-3 text-sm text-slate-700">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-slate-500">
+              child_id
+            </p>
+            <p className="font-mono text-base text-slate-900">
+              {childId || 'Not provided'}
+            </p>
+          </div>
           {!childId && (
-            <p className="mt-3 text-sm">
-              Please
+            <p>
+              Please{' '}
               <Link
                 to="/child/new"
-                className="mx-1 font-semibold text-blue-600 hover:text-blue-500"
+                className="font-semibold text-blue-600 hover:text-blue-500"
               >
                 create a child profile
-              </Link>
+              </Link>{' '}
               before starting a session.
             </p>
           )}
-        </section>
+        </div>
+      </Card>
 
-        {childId && (
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {isSubmitting ? (
-              <StatusBanner variant="loading">
-                Generating prompt...
-              </StatusBanner>
-            ) : feedback ? (
-              <StatusBanner variant="error">{feedback}</StatusBanner>
-            ) : null}
+      {childId && (
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {isSubmitting ? (
+            <StatusBanner variant="loading">Generating prompt...</StatusBanner>
+          ) : feedback ? (
+            <StatusBanner variant="error">{feedback}</StatusBanner>
+          ) : null}
 
-            <section className="grid gap-6 md:grid-cols-2">
+          <FormSection
+            title="Mood & environment"
+            description="Help the robot understand how the child feels and what the setting looks like today."
+          >
+            <div className="grid gap-6 md:grid-cols-2">
               <Select
                 label="Mood"
-              name="mood"
-              value={form.mood}
-              onChange={handleChange}
-              placeholder="Select an option"
-              options={MOOD_OPTIONS}
-              disabled={isSubmitting}
-              error={fieldErrors.mood ?? null}
-            />
+                name="mood"
+                value={form.mood}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={MOOD_OPTIONS}
+                disabled={isSubmitting}
+                error={fieldErrors.mood ?? null}
+              />
 
-            <Select
-              label="Location"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              placeholder="Select an option"
-              options={LOCATION_OPTIONS}
-              disabled={isSubmitting}
-              error={fieldErrors.location ?? null}
-            />
+              <Select
+                label="Location"
+                name="location"
+                value={form.location}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={LOCATION_OPTIONS}
+                disabled={isSubmitting}
+                error={fieldErrors.location ?? null}
+              />
 
-            <Select
-              label="Noise Level"
-              name="noise"
-              value={form.noise}
-              onChange={handleChange}
-              placeholder="Select an option"
-              options={NOISE_OPTIONS}
-              disabled={isSubmitting}
-              error={fieldErrors.noise ?? null}
-            />
+              <Select
+                label="Noise Level"
+                name="noise"
+                value={form.noise}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={NOISE_OPTIONS}
+                disabled={isSubmitting}
+                error={fieldErrors.noise ?? null}
+              />
 
-            <Select
-              label="Crowd Density"
-              name="crowd"
-              value={form.crowd}
-              onChange={handleChange}
-              placeholder="Select an option"
-              options={CROWD_OPTIONS}
-              disabled={isSubmitting}
-              error={fieldErrors.crowd ?? null}
-            />
-          </section>
+              <Select
+                label="Crowd Density"
+                name="crowd"
+                value={form.crowd}
+                onChange={handleChange}
+                placeholder="Select an option"
+                options={CROWD_OPTIONS}
+                disabled={isSubmitting}
+                error={fieldErrors.crowd ?? null}
+              />
+            </div>
+          </FormSection>
 
-          <section className="space-y-6">
+          <FormSection
+            title="Situation context"
+            description="Share what happened today, any energy shifts, or specifics the robot should mention."
+          >
             <TextArea
-                label="Situation"
-                name="situation"
+              label="Situation"
+              name="situation"
               rows={6}
               maxLength={800}
               value={form.situation}
@@ -280,35 +296,32 @@ function SessionNew() {
               disabled={isSubmitting}
               error={fieldErrors.situation ?? null}
             />
-          </section>
+          </FormSection>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button
-                type="submit"
-                disabled={disableSubmit}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white shadow transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                {isSubmitting ? 'Submitting...' : 'Generate Prompt'}
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={isSubmitting}
-                className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-3 text-base font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Reset
-              </button>
-              <Link
-                to="/"
-                className="inline-flex items-center justify-center text-base font-semibold text-blue-600 hover:text-blue-500"
-              >
-                Cancel and return home
-              </Link>
-            </div>
-          </form>
-        )}
-      </div>
-    </main>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button
+              type="submit"
+              variant="primary"
+              loading={isSubmitting}
+              disabled={disableSubmit}
+            >
+              Generate Prompt
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleReset}
+              disabled={isSubmitting}
+            >
+              Reset
+            </Button>
+            <Link to="/" className={buttonClasses('ghost')}>
+              Cancel and return home
+            </Link>
+          </div>
+        </form>
+      )}
+    </PageContainer>
   )
 }
 
