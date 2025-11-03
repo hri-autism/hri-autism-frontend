@@ -296,12 +296,7 @@ function ChildNew() {
         </FormSection>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button
-            type="submit"
-            variant="primary"
-            loading={isSubmitting}
-            disabled={disableSubmit}
-          >
+          <Button type="submit" loading={isSubmitting} disabled={disableSubmit}>
             Create Profile
           </Button>
           <Button
@@ -312,10 +307,7 @@ function ChildNew() {
           >
             Reset
           </Button>
-          <Link
-            to="/"
-            className={buttonClasses('ghost')}
-          >
+          <Link to="/" className={buttonClasses({ variant: 'ghost' })}>
             Cancel and return home
           </Link>
         </div>

@@ -249,11 +249,11 @@ function SessionSuccess() {
               ? `/session/new?child_id=${encodeURIComponent(session.child_id)}`
               : '/session/new'
           }
-          className={buttonClasses('primary')}
+          className={buttonClasses()}
         >
           Start another session
         </Link>
-        <Link to="/" className={buttonClasses('secondary')}>
+        <Link to="/" className={buttonClasses({ variant: 'secondary' })}>
           Back to home
         </Link>
       </div>
