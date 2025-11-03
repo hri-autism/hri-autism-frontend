@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { COMM_LEVELS, PERSONALITIES } from '../lib/constants'
+import { useChild } from '../hooks/useChild'
 
 type FormState = {
   nickname: string
@@ -25,8 +26,8 @@ const initialState: FormState = {
 
 function ChildNew() {
   const [form, setForm] = useState<FormState>(initialState)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
+  const { createChild, isSubmitting, error, clearError } = useChild()
   const navigate = useNavigate()
 
   const handleChange = useCallback(
@@ -45,34 +46,67 @@ function ChildNew() {
   )
 
   const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+    async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault()
-      setIsSubmitting(true)
-      setError(null)
+      setFormError(null)
+      clearError()
+
+      const trimmedNickname = form.nickname.trim()
+      if (!trimmedNickname) {
+        setFormError('Nickname is required')
+        return
+      }
+
+      const parsedAge = Number(form.age)
+      if (!Number.isFinite(parsedAge) || parsedAge < 0) {
+        setFormError('Age must be a non-negative number')
+        return
+      }
+
+      if (!form.comm_level) {
+        setFormError('Communication level is required')
+        return
+      }
+
+      if (!form.personality) {
+        setFormError('Personality is required')
+        return
+      }
 
       try {
-        // TODO: replace with real API call once backend integration is ready.
-        const fakeChildId = 'temporary-child-id'
-        navigate(`/session/new?child_id=${encodeURIComponent(fakeChildId)}`)
+        const child = await createChild({
+          nickname: trimmedNickname,
+          age: parsedAge,
+          comm_level: form.comm_level as 'low' | 'medium' | 'high',
+          personality:
+            form.personality as 'shy' | 'active' | 'calm' | 'curious',
+          triggers_raw: form.triggers_raw || undefined,
+          interests_raw: form.interests_raw || undefined,
+          target_skills_raw: form.target_skills_raw || undefined,
+        })
+        navigate(`/session/new?child_id=${encodeURIComponent(child.child_id)}`)
       } catch (submissionError) {
         console.error(submissionError)
-        setError('Failed to submit the form. Please try again.')
-      } finally {
-        setIsSubmitting(false)
+        if (submissionError instanceof Error) {
+          setFormError(submissionError.message)
+        } else {
+          setFormError('Failed to submit the form. Please try again.')
+        }
       }
     },
-    [navigate],
+    [clearError, createChild, form, navigate],
   )
 
   const handleReset = useCallback(() => {
     setForm(initialState)
-    setError(null)
-  }, [])
+    setFormError(null)
+    clearError()
+  }, [clearError])
 
   const disableSubmit = useMemo(() => {
     return (
       isSubmitting ||
-      !form.nickname ||
+      !form.nickname.trim() ||
       !form.age ||
       !form.comm_level ||
       !form.personality
@@ -99,9 +133,9 @@ function ChildNew() {
           </p>
         </header>
 
-        {error && (
+        {(formError || error) && (
           <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
+            {formError ?? error}
           </div>
         )}
 
