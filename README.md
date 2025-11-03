@@ -1,25 +1,10 @@
 # HRI Autism Frontend
 
-基于 Vite + React + TypeScript + Tailwind CSS 的前端项目，用于配合后端生成儿童社交机器人会话提示。
+A Vite + React + TypeScript + Tailwind CSS frontend that works with the HRI autism backend to generate daily robot interaction prompts for children.
 
-## 开发
+## Routes (no-auth milestone)
 
-```bash
-npm install
-npm run dev
-```
-
-默认开发地址：http://localhost:5173
-
-## 环境变量
-
-- `VITE_API_BASE`：后端 FastAPI 服务地址，配置在 `.env.local`。
-
-## 页面结构（无登录阶段）
-
-- `/`：Home，项目简介与操作入口。
-- `/child/new`：创建孩子档案，提交成功后将带着 `child_id` 跳转到会话页面。
-- `/session/new?child_id=...`：填写当天 session 信息并触发 prompt 生成。
-- `/session/success/:sessionId`：展示生成成功的只读 prompt，并提供再次创建会话按钮。
-
-后续将逐步接入实际表单、API 请求、表单校验和登录功能。
+- `/` – Home page with project overview and primary actions.
+- `/child/new` – Create a child profile. On success the app redirects to `/session/new?child_id=<UUID>`.
+- `/session/new?child_id=...` – Daily session form that submits mood, environment, and situation to generate a prompt.
+- `/session/success/:sessionId` – Read-only prompt viewer with an option to start another session.
