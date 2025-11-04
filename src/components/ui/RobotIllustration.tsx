@@ -18,26 +18,22 @@ export function RobotIllustration() {
   return (
     <div className="relative h-64 w-64">
       <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/80 via-purple-500/70 to-cyan-400/70 blur-3xl opacity-70" />
-      <div className="absolute inset-6 rounded-[48%] border border-white/40 bg-slate-900/90 shadow-[0_20px_70px_rgba(56,189,248,0.35)]" />
-      <div className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-3 text-cyan-200">
-        <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-cyan-300" />
-        <span className="text-sm uppercase tracking-[0.3em] text-cyan-200/90">
-          Ready
-        </span>
-      </div>
-      <div className="absolute left-1/2 top-24 -translate-x-1/2">
-        <div className="relative h-24 w-32 rounded-3xl border border-white/40 bg-slate-800/90 shadow-lg">
-          <div className="absolute inset-x-8 top-4 flex h-10 items-center justify-around rounded-xl bg-slate-900/80 shadow-inner">
-            <span className="relative block h-2 w-12 rounded-full bg-cyan-300/80">
-              <span className="absolute inset-y-0 left-0 w-1/3 animate-[ping_1.5s_ease-in-out_infinite] rounded-full bg-cyan-100/70" />
-            </span>
-            <span className="h-2 w-2 rounded-full bg-cyan-200/70" />
-            <span className="h-2 w-2 rounded-full bg-cyan-200/70" />
+      <div className="absolute inset-6 rounded-[48%] border border-white/10 bg-gradient-to-br from-slate-950/90 via-slate-900/80 to-slate-950/90 shadow-[0_20px_70px_rgba(56,189,248,0.35)]" />
+      <div className="absolute left-1/2 top-16 -translate-x-1/2">
+        <div className="relative h-24 w-32 overflow-hidden rounded-3xl border border-white/40 bg-slate-800/90 shadow-lg">
+          <div className="absolute inset-x-6 top-6 h-10 rounded-xl bg-slate-900/80 shadow-inner">
+            <div className="absolute left-0 top-0 h-full w-full overflow-hidden">
+              <div className="absolute inset-0 animate-[scan_3s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent" />
+              <div className="absolute inset-x-4 top-1 flex h-2 items-center gap-2">
+                <span className="h-1 w-16 rounded-full bg-cyan-200/70" />
+                <span className="h-1 w-6 rounded-full bg-purple-300/50" />
+              </div>
+            </div>
           </div>
-          <div className="absolute inset-x-6 bottom-4 flex justify-between text-[10px] uppercase tracking-wide text-slate-400">
-            <span>Emotion</span>
-            <span>Context</span>
-            <span>Prompt</span>
+          <div className="absolute inset-x-6 bottom-4 flex justify-between text-[10px] uppercase tracking-wide text-slate-400/80">
+            <span>emotion</span>
+            <span>context</span>
+            <span>prompt</span>
           </div>
         </div>
       </div>
@@ -79,4 +75,3 @@ export const heroParallaxStyles = `
   [--cloud-mid:translateZ(-100px)_scale(1.1)]
   [--cloud-front:translateZ(0px)_scale(1)]
 `
-

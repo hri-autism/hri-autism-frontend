@@ -186,7 +186,7 @@ function ChildNew() {
         }
       />
 
-      <form onSubmit={handleSubmit} className="relative space-y-8">
+      <form onSubmit={handleSubmit} className="relative space-y-10">
         {isSubmitting ? (
           <LoadingOverlay tone="dark">
             Creating child profile...
@@ -195,11 +195,12 @@ function ChildNew() {
           <StatusBanner variant="error">{feedback}</StatusBanner>
         ) : null}
 
-        <FormSection
-          title="Child basics"
-          description="Nickname, age, communication level and personality help tailor the robot's tone."
-          tone="dark"
-        >
+      <FormSection
+        title="Child basics"
+        description="Nickname, age, communication level and personality help tailor the robot's tone."
+        tone="dark"
+        className="shadow-[0_30px_80px_rgba(56,189,248,0.12)]"
+      >
           <div className="grid gap-6 md:grid-cols-2">
             <TextInput
               label="Nickname"
@@ -257,6 +258,7 @@ function ChildNew() {
           title="Long-form context (optional)"
           description="These backups help regenerate prompts if keywords ever need to be refreshed."
           tone="dark"
+          className="shadow-[0_30px_80px_rgba(56,189,248,0.12)]"
         >
           <div className="space-y-6">
             <TextArea

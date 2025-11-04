@@ -55,12 +55,15 @@ export function Hero() {
         </div>
       </div>
       <div className="relative z-10 flex items-center justify-center pb-12">
-        <div className="flex flex-col items-center gap-3 text-slate-300/80">
+        <a
+          href="#features"
+          className="flex flex-col items-center gap-3 text-slate-300/80 transition hover:text-cyan-200"
+        >
           <span className="text-xs uppercase tracking-[0.4em]">Scroll</span>
-          <span className="flex h-14 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/30">
+          <span className="flex h-14 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/40">
             <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-cyan-300" />
           </span>
-        </div>
+        </a>
       </div>
     </section>
   )

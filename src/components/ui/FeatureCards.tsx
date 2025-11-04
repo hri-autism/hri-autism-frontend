@@ -24,7 +24,7 @@ const features = [
 
 export function FeatureCards() {
   return (
-    <section className="mx-auto grid max-w-6xl gap-6 px-6 py-16 md:grid-cols-3">
+    <section id="features" className="mx-auto grid max-w-6xl gap-6 px-6 py-16 md:grid-cols-3">
       {features.map((feature) => (
         <Card
           key={feature.title}

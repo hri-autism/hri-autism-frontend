@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
@@ -8,7 +8,6 @@ import {
   MOODS,
 } from '../lib/constants'
 import { useSession } from '../hooks/useSession'
-import { request } from '../lib/api'
 import { Select, TextArea } from '../components/form'
 import {
   Button,
@@ -16,7 +15,6 @@ import {
   EmptyState,
   FormSection,
   LoadingOverlay,
-  KeywordSummary,
   PageContainer,
   SectionHeader,
   StatusBanner,
@@ -39,16 +37,6 @@ const initialState: FormState = {
   noise: '',
   crowd: '',
   situation: '',
-}
-
-type ChildProfileSummary = {
-  child_id: string
-  nickname: string
-  comm_level: string
-  personality: string
-  interests: string
-  triggers: string
-  target_skills: string
 }
 
 function humanize(option: string) {
@@ -85,26 +73,8 @@ function SessionNew() {
   const [form, setForm] = useState<FormState>(initialState)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
-  const [childSummary, setChildSummary] = useState<ChildProfileSummary | null>(null)
-  const [summaryLoading, setSummaryLoading] = useState(false)
-  const [summaryError, setSummaryError] = useState<string | null>(null)
   const { createSession, isSubmitting, error, clearError } = useSession()
   const navigate = useNavigate()
-
-  const fetchChildProfile = useCallback(async () => {
-    if (!childId) return
-    setSummaryLoading(true)
-    setSummaryError(null)
-    try {
-      const data = await request<ChildProfileSummary>(`/api/children/${childId}`)
-      setChildSummary(data)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load child profile'
-      setSummaryError(message)
-    } finally {
-      setSummaryLoading(false)
-    }
-  }, [childId])
 
   const handleChange = useCallback(
     (
@@ -218,16 +188,6 @@ function SessionNew() {
 
   const feedback = formError ?? error
 
-  useEffect(() => {
-    if (!childId) {
-      setChildSummary(null)
-      setSummaryError(null)
-      setSummaryLoading(false)
-      return
-    }
-    fetchChildProfile()
-  }, [childId, fetchChildProfile])
-
   return (
     <PageContainer variant="dark" contentClassName="space-y-12">
       <SectionHeader
@@ -268,17 +228,8 @@ function SessionNew() {
         )}
       </Card>
 
-      {childId ? (
-        <KeywordSummary
-          child={childSummary}
-          loading={summaryLoading}
-          error={summaryError}
-          onRetry={fetchChildProfile}
-        />
-      ) : null}
-
       {childId && (
-        <form onSubmit={handleSubmit} className="relative space-y-8">
+        <form onSubmit={handleSubmit} className="relative space-y-10">
           {isSubmitting ? (
             <LoadingOverlay tone="dark">Generating prompt...</LoadingOverlay>
           ) : feedback ? (
