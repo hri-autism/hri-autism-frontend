@@ -171,24 +171,26 @@ function ChildNew() {
   const feedback = formError ?? error
 
   return (
-    <PageContainer>
+    <PageContainer variant="dark" contentClassName="space-y-12">
       <SectionHeader
+        tone="dark"
         title="Create Child Profile"
         description={
-          <>
+          <span className="text-slate-300">
             Provide the child&apos;s baseline information to generate a unique{' '}
-            <code className="mx-1 rounded bg-slate-100 px-1 py-0.5 text-sm">
+            <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-cyan-200">
               child_id
-            </code>
-            . After submission you&apos;ll jump directly to the daily session
-            form.
-          </>
+            </span>{' '}
+            and reuse it for every future session.
+          </span>
         }
       />
 
       <form onSubmit={handleSubmit} className="relative space-y-8">
         {isSubmitting ? (
-          <LoadingOverlay label="Creating child profile..." />
+          <LoadingOverlay tone="dark">
+            Creating child profile...
+          </LoadingOverlay>
         ) : feedback ? (
           <StatusBanner variant="error">{feedback}</StatusBanner>
         ) : null}
@@ -196,6 +198,7 @@ function ChildNew() {
         <FormSection
           title="Child basics"
           description="Nickname, age, communication level and personality help tailor the robot's tone."
+          tone="dark"
         >
           <div className="grid gap-6 md:grid-cols-2">
             <TextInput
@@ -253,6 +256,7 @@ function ChildNew() {
         <FormSection
           title="Long-form context (optional)"
           description="These backups help regenerate prompts if keywords ever need to be refreshed."
+          tone="dark"
         >
           <div className="space-y-6">
             <TextArea

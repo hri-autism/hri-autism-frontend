@@ -14,6 +14,7 @@ type EmptyStateProps = {
   icon?: ReactNode
   actions?: EmptyStateAction[]
   className?: string
+  tone?: 'light' | 'dark'
 }
 
 export function EmptyState({
@@ -22,16 +23,26 @@ export function EmptyState({
   icon,
   actions = [],
   className = '',
+  tone = 'light',
 }: EmptyStateProps) {
+  const toneClasses =
+    tone === 'dark'
+      ? 'border-slate-700/60 bg-slate-900/60 text-slate-100'
+      : 'border-slate-300 bg-white/70 text-slate-900'
+
   return (
     <div
-      className={`flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center ${className}`}
+      className={`flex flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-10 text-center backdrop-blur ${toneClasses} ${className}`}
     >
-      {icon ? <div className="text-3xl text-slate-400">{icon}</div> : null}
+      {icon ? (
+        <div className={`text-3xl ${tone === 'dark' ? 'text-slate-400' : 'text-slate-400'}`}>
+          {icon}
+        </div>
+      ) : null}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <h3 className="text-lg font-semibold">{title}</h3>
         {description ? (
-          <p className="max-w-md text-sm text-slate-600">{description}</p>
+          <p className="max-w-md text-sm opacity-80">{description}</p>
         ) : null}
       </div>
       {actions.length > 0 ? (

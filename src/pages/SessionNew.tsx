@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
@@ -8,6 +8,7 @@ import {
   MOODS,
 } from '../lib/constants'
 import { useSession } from '../hooks/useSession'
+import { request } from '../lib/api'
 import { Select, TextArea } from '../components/form'
 import {
   Button,
@@ -15,6 +16,7 @@ import {
   EmptyState,
   FormSection,
   LoadingOverlay,
+  KeywordSummary,
   PageContainer,
   SectionHeader,
   StatusBanner,
@@ -37,6 +39,16 @@ const initialState: FormState = {
   noise: '',
   crowd: '',
   situation: '',
+}
+
+type ChildProfileSummary = {
+  child_id: string
+  nickname: string
+  comm_level: string
+  personality: string
+  interests: string
+  triggers: string
+  target_skills: string
 }
 
 function humanize(option: string) {
@@ -73,8 +85,26 @@ function SessionNew() {
   const [form, setForm] = useState<FormState>(initialState)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
+  const [childSummary, setChildSummary] = useState<ChildProfileSummary | null>(null)
+  const [summaryLoading, setSummaryLoading] = useState(false)
+  const [summaryError, setSummaryError] = useState<string | null>(null)
   const { createSession, isSubmitting, error, clearError } = useSession()
   const navigate = useNavigate()
+
+  const fetchChildProfile = useCallback(async () => {
+    if (!childId) return
+    setSummaryLoading(true)
+    setSummaryError(null)
+    try {
+      const data = await request<ChildProfileSummary>(`/api/children/${childId}`)
+      setChildSummary(data)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load child profile'
+      setSummaryError(message)
+    } finally {
+      setSummaryLoading(false)
+    }
+  }, [childId])
 
   const handleChange = useCallback(
     (
@@ -188,24 +218,36 @@ function SessionNew() {
 
   const feedback = formError ?? error
 
+  useEffect(() => {
+    if (!childId) {
+      setChildSummary(null)
+      setSummaryError(null)
+      setSummaryLoading(false)
+      return
+    }
+    fetchChildProfile()
+  }, [childId, fetchChildProfile])
+
   return (
-    <PageContainer>
+    <PageContainer variant="dark" contentClassName="space-y-12">
       <SectionHeader
+        tone="dark"
         title="Create Daily Session"
-        description="Provide the child’s current mood, environment, and situation so the backend can generate an actionable prompt."
+        description="Provide the child’s current mood, environment, and situation so the robot can respond empathetically."
       />
 
       <Card
         title="Selected child"
         description="Sessions are tied to an existing child profile."
+        tone="dark"
       >
         {childId ? (
-          <div className="space-y-3 text-sm text-slate-700">
+          <div className="space-y-3 text-sm text-slate-200/90">
             <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">
+              <p className="text-xs uppercase tracking-wide text-slate-400">
                 child_id
               </p>
-              <p className="font-mono text-base text-slate-900 break-words">
+              <p className="font-mono text-base text-cyan-200 break-words">
                 {childId}
               </p>
             </div>
@@ -214,6 +256,7 @@ function SessionNew() {
           <EmptyState
             title="No child selected"
             description="Create a child profile first so we can attach the daily session to the right person."
+            tone="dark"
             actions={[
               {
                 label: 'Create child profile',
@@ -225,10 +268,19 @@ function SessionNew() {
         )}
       </Card>
 
+      {childId ? (
+        <KeywordSummary
+          child={childSummary}
+          loading={summaryLoading}
+          error={summaryError}
+          onRetry={fetchChildProfile}
+        />
+      ) : null}
+
       {childId && (
         <form onSubmit={handleSubmit} className="relative space-y-8">
           {isSubmitting ? (
-            <LoadingOverlay label="Generating prompt..." />
+            <LoadingOverlay tone="dark">Generating prompt...</LoadingOverlay>
           ) : feedback ? (
             <StatusBanner variant="error">{feedback}</StatusBanner>
           ) : null}
@@ -236,6 +288,7 @@ function SessionNew() {
           <FormSection
             title="Mood & environment"
             description="Help the robot understand how the child feels and what the setting looks like today."
+            tone="dark"
           >
             <div className="grid gap-6 md:grid-cols-2">
               <Select
@@ -287,6 +340,7 @@ function SessionNew() {
           <FormSection
             title="Situation context"
             description="Share what happened today, any energy shifts, or specifics the robot should mention."
+            tone="dark"
           >
             <TextArea
               label="Situation"

@@ -6,6 +6,7 @@ type CardProps = {
   children: ReactNode
   footer?: ReactNode
   className?: string
+  tone?: 'light' | 'dark'
 }
 
 export function Card({
@@ -13,20 +14,28 @@ export function Card({
   description,
   children,
   footer,
+  tone = 'light',
   className = '',
 }: CardProps) {
+  const toneClasses =
+    tone === 'dark'
+      ? 'border-slate-700/60 bg-slate-900/70 text-slate-100'
+      : 'border-slate-200 bg-white/80 text-slate-800'
+
   return (
     <section
-      className={`rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-sm transition-shadow ${className}`}
+      className={`rounded-2xl border p-6 shadow-sm transition-shadow ${toneClasses} ${className}`}
     >
       <div className="space-y-4">
         {(title || description) && (
           <div className="space-y-1">
             {title ? (
-              <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+              <h2 className="text-lg font-semibold">
+                {title}
+              </h2>
             ) : null}
             {description ? (
-              <p className="text-sm text-slate-600">{description}</p>
+              <p className="text-sm opacity-80">{description}</p>
             ) : null}
           </div>
         )}
