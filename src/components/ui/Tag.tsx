@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-type TagVariant = 'neutral' | 'info' | 'success' | 'danger'
+type TagVariant = 'neutral' | 'info' | 'success' | 'danger' | 'glow'
 
 type TagProps = {
   variant?: TagVariant
@@ -14,6 +14,8 @@ const variantClasses: Record<TagVariant, string> = {
   info: 'bg-blue-100 text-blue-700',
   success: 'bg-green-100 text-green-700',
   danger: 'bg-red-100 text-red-700',
+  glow:
+    'border border-cyan-400/40 bg-cyan-400/10 text-cyan-200 shadow-[0_0_25px_rgba(56,189,248,0.35)]',
 }
 
 export function Tag({

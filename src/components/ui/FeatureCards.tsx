@@ -24,15 +24,19 @@ const features = [
 
 export function FeatureCards() {
   return (
-    <section id="features" className="mx-auto grid max-w-6xl gap-6 px-6 py-16 md:grid-cols-3">
+    <section
+      id="features"
+      className="mx-auto grid max-w-6xl gap-6 px-6 py-16 md:grid-cols-3"
+    >
       {features.map((feature) => (
         <Card
           key={feature.title}
           title={feature.title}
           description={feature.description}
-          className="bg-white/80 backdrop-blur-sm transition hover:-translate-y-1 hover:shadow-xl"
+          tone="dark"
+          className="border-cyan-400/15 bg-slate-900/60 backdrop-blur-lg shadow-[0_20px_70px_rgba(8,23,53,0.65)] transition hover:-translate-y-1 hover:border-cyan-300/40 hover:shadow-[0_35px_120px_rgba(56,189,248,0.25)]"
         >
-          <Tag variant="info">{feature.tag}</Tag>
+          <Tag variant="glow">{feature.tag}</Tag>
         </Card>
       ))}
     </section>

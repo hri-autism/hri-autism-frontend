@@ -176,12 +176,12 @@ function ChildNew() {
         tone="dark"
         title="Create Child Profile"
         description={
-          <span className="text-slate-300">
-            Provide the child&apos;s baseline information to generate a unique{' '}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap text-slate-300">
+            <span>Provide the child&apos;s baseline information to generate a unique</span>
             <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-cyan-200">
               child_id
-            </span>{' '}
-            and reuse it for every future session.
+            </span>
+            <span>and reuse it for every future session.</span>
           </span>
         }
       />

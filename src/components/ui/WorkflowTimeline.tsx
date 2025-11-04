@@ -26,16 +26,17 @@ export function WorkflowTimeline() {
         {steps.map((step, index) => (
           <div key={step.title} className="relative flex gap-6">
             <div className="hidden flex-col items-center md:flex">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-cyan-400/40 bg-slate-900/70 text-lg font-semibold text-cyan-200 shadow-lg">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full border border-cyan-400/40 bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-slate-950/80 text-lg font-semibold text-cyan-200 shadow-[0_0_30px_rgba(56,189,248,0.25)]">
                 {index + 1}
               </span>
             </div>
             <Card
               title={step.title}
               description={step.description}
-              className="flex-1 bg-white/85 backdrop-blur-sm transition hover:-translate-y-1 hover:shadow-xl"
+              tone="dark"
+              className="flex-1 border-cyan-400/15 bg-slate-900/60 backdrop-blur-lg shadow-[0_18px_60px_rgba(8,23,53,0.6)] transition hover:-translate-y-1 hover:border-cyan-300/40 hover:shadow-[0_30px_110px_rgba(56,189,248,0.25)]"
             >
-              <span className="hidden text-sm text-slate-500 md:block">
+              <span className="hidden text-sm text-cyan-200/70 md:block">
                 Step {index + 1}
               </span>
             </Card>
