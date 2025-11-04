@@ -10,10 +10,13 @@ type StatusBannerProps = {
 }
 
 const variantClasses: Record<StatusVariant, string> = {
-  info: 'border-slate-300 bg-slate-50 text-slate-700',
-  success: 'border-green-200 bg-green-50 text-green-700',
-  error: 'border-red-200 bg-red-50 text-red-700',
-  loading: 'border-blue-200 bg-blue-50 text-blue-700',
+  info: 'border-cyan-400/40 bg-slate-900/70 text-cyan-100 shadow-[0_25px_60px_rgba(56,189,248,0.15)]',
+  success:
+    'border-emerald-400/40 bg-slate-900/70 text-emerald-100 shadow-[0_25px_60px_rgba(16,185,129,0.15)]',
+  error:
+    'border-rose-400/40 bg-slate-900/70 text-rose-200 shadow-[0_25px_60px_rgba(244,63,94,0.2)]',
+  loading:
+    'border-blue-400/40 bg-slate-900/70 text-cyan-100 shadow-[0_25px_60px_rgba(59,130,246,0.18)]',
 }
 
 const variantLabels: Record<StatusVariant, string> = {
@@ -31,7 +34,7 @@ export function StatusBanner({
   if (!children) return null
 
   const baseClasses =
-    'rounded-md border px-4 py-3 text-sm flex items-start gap-3'
+    'flex items-start gap-3 rounded-2xl border px-5 py-4 text-sm backdrop-blur-md transition-shadow'
 
   return (
     <div
@@ -39,11 +42,13 @@ export function StatusBanner({
       role={variant === 'loading' ? 'status' : variant === 'error' ? 'alert' : 'status'}
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
     >
-      <span className="flex items-center gap-2 font-semibold">
+      <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.35em] text-slate-300">
         {variant === 'loading' ? <Spinner size="sm" /> : null}
         {variantLabels[variant]}
       </span>
-      <span>{children}</span>
+      <span className="font-mono text-sm text-slate-100 tracking-[0.08em]">
+        {children}
+      </span>
     </div>
   )
 }

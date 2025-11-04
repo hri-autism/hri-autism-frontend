@@ -105,15 +105,25 @@ function ChildNew() {
         newErrors.personality = 'Select a personality'
       }
 
-      if (form.triggers_raw && form.triggers_raw.length > 800) {
+      const triggersTrimmed = form.triggers_raw.trim()
+      const interestsTrimmed = form.interests_raw.trim()
+      const skillsTrimmed = form.target_skills_raw.trim()
+
+      if (!triggersTrimmed) {
+        newErrors.triggers_raw = 'Sensitive topics are required'
+      } else if (triggersTrimmed.length > 800) {
         newErrors.triggers_raw = 'Sensitive topics must be 800 characters or less'
       }
 
-      if (form.interests_raw && form.interests_raw.length > 800) {
+      if (!interestsTrimmed) {
+        newErrors.interests_raw = 'Long-term interests are required'
+      } else if (interestsTrimmed.length > 800) {
         newErrors.interests_raw = 'Long-term interests must be 800 characters or less'
       }
 
-      if (form.target_skills_raw && form.target_skills_raw.length > 800) {
+      if (!skillsTrimmed) {
+        newErrors.target_skills_raw = 'Target skills are required'
+      } else if (skillsTrimmed.length > 800) {
         newErrors.target_skills_raw = 'Target skills must be 800 characters or less'
       }
 
@@ -133,9 +143,9 @@ function ChildNew() {
           comm_level: form.comm_level as 'low' | 'medium' | 'high',
           personality:
             form.personality as 'shy' | 'active' | 'calm' | 'curious',
-          triggers_raw: form.triggers_raw || undefined,
-          interests_raw: form.interests_raw || undefined,
-          target_skills_raw: form.target_skills_raw || undefined,
+          triggers_raw: triggersTrimmed,
+          interests_raw: interestsTrimmed,
+          target_skills_raw: skillsTrimmed,
         })
         navigate(`/session/new?child_id=${encodeURIComponent(child.child_id)}`)
       } catch (submissionError) {
@@ -164,6 +174,9 @@ function ChildNew() {
       !form.age ||
       !form.comm_level ||
       !form.personality ||
+      !form.triggers_raw.trim() ||
+      !form.interests_raw.trim() ||
+      !form.target_skills_raw.trim() ||
       Object.keys(fieldErrors).length > 0
     )
   }, [fieldErrors, form, isSubmitting])
@@ -213,6 +226,7 @@ function ChildNew() {
               maxLength={100}
               disabled={isSubmitting}
               error={fieldErrors.nickname ?? null}
+              tone="dark"
             />
 
             <TextInput
@@ -226,6 +240,7 @@ function ChildNew() {
               required
               disabled={isSubmitting}
               error={fieldErrors.age ?? null}
+              tone="dark"
             />
 
             <Select
@@ -238,6 +253,7 @@ function ChildNew() {
               required
               disabled={isSubmitting}
               error={fieldErrors.comm_level ?? null}
+              tone="dark"
             />
 
             <Select
@@ -250,19 +266,20 @@ function ChildNew() {
               required
               disabled={isSubmitting}
               error={fieldErrors.personality ?? null}
+              tone="dark"
             />
           </div>
         </FormSection>
 
         <FormSection
-          title="Long-form context (optional)"
-          description="These backups help regenerate prompts if keywords ever need to be refreshed."
+          title="Long-form context"
+          description="Required narratives that feed the child model and regenerate prompts when needed."
           tone="dark"
           className="shadow-[0_30px_80px_rgba(56,189,248,0.12)]"
         >
           <div className="space-y-6">
             <TextArea
-              label="Sensitive Topics (triggers_raw)"
+              label="Sensitive Topics"
               name="triggers_raw"
               rows={4}
               value={form.triggers_raw}
@@ -272,10 +289,12 @@ function ChildNew() {
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.triggers_raw ?? null}
+              required
+              tone="dark"
             />
 
             <TextArea
-              label="Long-term Interests (interests_raw)"
+              label="Long-term Interests"
               name="interests_raw"
               rows={4}
               value={form.interests_raw}
@@ -284,10 +303,12 @@ function ChildNew() {
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.interests_raw ?? null}
+              required
+              tone="dark"
             />
 
             <TextArea
-              label="Target Skills (target_skills_raw)"
+              label="Target Skills"
               name="target_skills_raw"
               rows={4}
               value={form.target_skills_raw}
@@ -296,6 +317,8 @@ function ChildNew() {
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.target_skills_raw ?? null}
+              required
+              tone="dark"
             />
           </div>
         </FormSection>

@@ -35,7 +35,7 @@ export function Hero() {
             Guide your social robot with <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">real-time empathy</span>
           </h1>
           <p className="text-lg text-slate-200/90">
-            Parents and therapists collaborate to give the robot just-in-time context, so every interaction feels warm, attentive, and aligned with the child’s needs.
+            Parents and therapists collaborate to give the robot just-in-time context, so every interaction feels warm, attentive, and aligned with the child's needs.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button as="link" href="/session/new" size="lg">

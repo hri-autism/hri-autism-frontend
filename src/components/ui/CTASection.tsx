@@ -1,28 +1,43 @@
 import { Button } from './Button'
-import { Card } from './Card'
 
 export function CTASection() {
   return (
-    <section className="bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-cyan-500/10 py-20">
-      <div className="mx-auto max-w-4xl px-6">
-        <Card className="bg-white/90 backdrop-blur py-12 text-center shadow-xl">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-semibold text-slate-900">
+    <section className="relative py-20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_70%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(79,70,229,0.15)_0%,rgba(56,189,248,0.08)_45%,rgba(14,116,144,0.04)_100%)]" />
+
+      <div className="relative mx-auto max-w-4xl px-6">
+        <div className="relative overflow-hidden rounded-3xl border border-cyan-400/30 bg-slate-950/70 p-12 text-center shadow-[0_45px_140px_rgba(56,189,248,0.25)] backdrop-blur-xl">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(56,189,248,0.12),_transparent_65%)]" />
+          <div className="pointer-events-none absolute -right-24 top-0 h-48 w-48 rounded-full bg-cyan-400/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 bottom-0 h-52 w-52 rounded-full bg-purple-500/15 blur-3xl" />
+
+          <div className="relative space-y-5">
+            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.35em] text-cyan-200">
+              stay in sync
+            </span>
+            <h2 className="text-3xl font-semibold text-white md:text-4xl">
               Ready to sync your robot with real-time empathy?
             </h2>
-            <p className="text-base text-slate-600">
-              Start by building a child profile or jump directly into a new session. Your robot will thank you.
+            <p className="text-base text-slate-200/80 md:text-lg">
+              Build a baseline profile or jump straight into today’s session. Your robot will respond with sharper context every time.
             </p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button as="link" href="/session/new" size="md">
+            <div className="flex flex-col justify-center gap-4 pt-2 sm:flex-row">
+              <Button as="link" href="/session/new" size="md" className="px-6">
                 Start a session
               </Button>
-              <Button as="link" href="/child/new" variant="secondary" size="md">
+              <Button
+                as="link"
+                href="/child/new"
+                variant="secondary"
+                size="md"
+                className="px-6"
+              >
                 Create child profile
               </Button>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </section>
   )

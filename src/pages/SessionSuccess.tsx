@@ -12,6 +12,9 @@ import {
   Tag,
   buttonClasses,
 } from '../components/ui'
+import { useTypewriter } from '../hooks/useTypewriter'
+import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
 
 type SessionDetail = {
   session_id: string
@@ -42,27 +45,49 @@ function humanize(option: string) {
 
 const MAX_AUTO_RETRIES = 3
 
-function PromptTypewriter({ text, speed = 6 }: { text: string; speed?: number }) {
-  const [display, setDisplay] = useState('')
+const typewriterFallback = 'Preparing prompt...'
 
-  useEffect(() => {
-    setDisplay('')
-    if (!text) return
-    let index = 0
-    const interval = window.setInterval(() => {
-      index += 1
-      setDisplay(text.slice(0, index))
-      if (index >= text.length) {
-        window.clearInterval(interval)
-      }
-    }, speed)
-    return () => window.clearInterval(interval)
-  }, [text, speed])
+const promptMarkdownComponents: Components = {
+  p: ({ node, ...props }) => (
+    <p className="mb-3 text-slate-100 last:mb-0" {...props} />
+  ),
+  strong: ({ node, ...props }) => (
+    <strong className="text-cyan-200" {...props} />
+  ),
+  em: ({ node, ...props }) => (
+    <em className="text-purple-200" {...props} />
+  ),
+  ul: ({ node, ...props }) => (
+    <ul className="my-3 list-disc space-y-2 pl-5 text-slate-100 marker:text-cyan-300" {...props} />
+  ),
+  ol: ({ node, ...props }) => (
+    <ol className="my-3 list-decimal space-y-2 pl-5 text-slate-100 marker:text-cyan-300" {...props} />
+  ),
+  li: ({ node, ...props }) => (
+    <li className="leading-relaxed" {...props} />
+  ),
+  code: ({ node, inline, className, children, ...props }) =>
+    inline ? (
+      <code className="rounded bg-slate-800/80 px-1 py-0.5 text-cyan-200" {...props}>
+        {children}
+      </code>
+    ) : (
+      <code className="block rounded-xl bg-slate-900/80 p-3 text-cyan-200" {...props}>
+        {children}
+      </code>
+    ),
+}
+
+function PromptTypewriter({ text, speed = 3 }: { text: string; speed?: number }) {
+  const display = useTypewriter(text, {
+    speed,
+    fallback: typewriterFallback,
+  })
 
   return (
-    <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-slate-100">
+    <ReactMarkdown className="space-y-3 text-sm leading-relaxed" components={promptMarkdownComponents}>
       {display}
-    </p>
+    </ReactMarkdown>
   )
 }
 
@@ -159,15 +184,6 @@ function SessionSuccess() {
     fetchChildProfile(session.child_id)
   }, [fetchChildProfile, session?.child_id])
 
-  const handleRefresh = useCallback(() => {
-    if (!sessionId) return
-    setIsAutoRetrying(false)
-    setRetryCount(0)
-    fetchSession(sessionId, { retry: false }).catch(() => {
-      /* handled within fetchSession */
-    })
-  }, [fetchSession, sessionId])
-
   const handleCopyPrompt = useCallback(async () => {
     if (!session?.prompt) return
     try {
@@ -189,7 +205,13 @@ function SessionSuccess() {
     return session.environment.split(',').map((token) => humanize(token.trim()))
   }, [session])
 
-  const refreshDisabled = isLoading || isAutoRetrying
+  const createdAtDisplay = useMemo(() => {
+    if (!session?.created_at) return ''
+    return new Intl.DateTimeFormat('en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'medium',
+    }).format(new Date(session.created_at))
+  }, [session?.created_at])
 
   return (
     <PageContainer variant="dark" contentClassName="space-y-12">
@@ -202,7 +224,7 @@ function SessionSuccess() {
 
       {session && !errorMessage ? (
         <StatusBanner variant="success">
-          Prompt created at {new Date(session.created_at).toLocaleString()}.
+          Prompt created at {createdAtDisplay}.
         </StatusBanner>
       ) : null}
 
@@ -220,23 +242,10 @@ function SessionSuccess() {
         </StatusBanner>
       ) : null}
 
-      {sessionId ? (
-        <div className="flex flex-wrap items-center gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleRefresh}
-            disabled={refreshDisabled}
-            loading={refreshDisabled && !isAutoRetrying}
-          >
-            {refreshDisabled ? 'Refreshing...' : 'Refresh prompt'}
-          </Button>
-          {retryCount > 0 && retryCount < MAX_AUTO_RETRIES ? (
-            <span className="text-xs text-slate-400">
-              Tried {retryCount} / {MAX_AUTO_RETRIES} automatic refreshes.
-            </span>
-          ) : null}
-        </div>
+      {sessionId && retryCount > 0 && retryCount < MAX_AUTO_RETRIES ? (
+        <span className="text-xs text-slate-400">
+          Tried {retryCount} / {MAX_AUTO_RETRIES} automatic refreshes.
+        </span>
       ) : null}
 
       {session ? (
@@ -265,9 +274,11 @@ function SessionSuccess() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Tag variant="info">Mood: {humanize(session.mood)}</Tag>
+              <Tag variant="mood">Mood: {humanize(session.mood)}</Tag>
               {environmentChips.map((chip) => (
-                <Tag key={chip}>{chip}</Tag>
+                <Tag key={chip} variant="environment">
+                  {chip}
+                </Tag>
               ))}
             </div>
           </Card>
@@ -276,7 +287,6 @@ function SessionSuccess() {
             child={childProfile}
             loading={childLoading}
             error={childError}
-            onRetry={session?.child_id ? () => fetchChildProfile(session.child_id) : undefined}
           />
 
           <Card
@@ -324,7 +334,7 @@ function SessionSuccess() {
             }
           >
             <div className="rounded-2xl border border-slate-700/60 bg-slate-950/70 p-4 shadow-inner">
-              <PromptTypewriter text={session.prompt} speed={5} />
+              <PromptTypewriter text={session.prompt} speed={2} />
             </div>
           </Card>
         </div>

@@ -6,14 +6,14 @@ export function Testimonial() {
       <Card className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-900/80 text-slate-100">
         <div className="space-y-4">
           <p className="text-lg italic text-slate-100/90">
-            “The prompt captured Leo’s exhaustion after therapy perfectly. Our robot slowed down, asked softer questions, and he actually stayed engaged for 20 minutes.”
+            “The prompt captured Leo's exhaustion after therapy perfectly. Our robot slowed down, asked softer questions, and he actually stayed engaged for 20 minutes.”
           </p>
           <div className="flex items-center gap-3 text-sm text-slate-300/80">
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-purple-500" />
             <div>
-              <p className="font-semibold text-slate-100">Maya N.</p>
+              <p className="font-semibold text-slate-100">Deck W</p>
               <p className="text-xs uppercase tracking-wide text-slate-400">
-                Parent & co-creator
+                Parent
               </p>
             </div>
           </div>

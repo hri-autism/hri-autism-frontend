@@ -251,6 +251,7 @@ function SessionNew() {
                 options={MOOD_OPTIONS}
                 disabled={isSubmitting}
                 error={fieldErrors.mood ?? null}
+                tone="dark"
               />
 
               <Select
@@ -262,6 +263,7 @@ function SessionNew() {
                 options={LOCATION_OPTIONS}
                 disabled={isSubmitting}
                 error={fieldErrors.location ?? null}
+                tone="dark"
               />
 
               <Select
@@ -273,6 +275,7 @@ function SessionNew() {
                 options={NOISE_OPTIONS}
                 disabled={isSubmitting}
                 error={fieldErrors.noise ?? null}
+                tone="dark"
               />
 
               <Select
@@ -284,6 +287,7 @@ function SessionNew() {
                 options={CROWD_OPTIONS}
                 disabled={isSubmitting}
                 error={fieldErrors.crowd ?? null}
+                tone="dark"
               />
             </div>
           </FormSection>
@@ -304,6 +308,7 @@ function SessionNew() {
               hint="Focus on temporary context, energy level, recent events, or anything the robot should know today."
               disabled={isSubmitting}
               error={fieldErrors.situation ?? null}
+              tone="dark"
             />
           </FormSection>
 
