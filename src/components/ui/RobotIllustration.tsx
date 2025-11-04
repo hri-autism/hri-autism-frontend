@@ -30,20 +30,31 @@ export function RobotIllustration() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-x-6 bottom-4 flex justify-between text-[10px] uppercase tracking-wide text-slate-400/80">
-            <span>emotion</span>
-            <span>context</span>
-            <span>prompt</span>
+          <div className="absolute inset-x-8 bottom-5 flex h-1 items-center justify-between opacity-80">
+            <span className="h-1 w-10 rounded-full bg-cyan-300/50" />
+            <span className="h-1 w-6 rounded-full bg-purple-400/40" />
+            <span className="h-1 w-4 rounded-full bg-amber-300/40" />
           </div>
         </div>
       </div>
       <div className="absolute left-1/2 top-[11.5rem] -translate-x-1/2">
         <div className="h-14 w-14 rounded-full border border-white/30 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-inner" />
         <div className="absolute left-1/2 top-10 h-10 w-2 -translate-x-1/2 rounded-full bg-slate-800/80" />
-        <div className="absolute -left-8 top-4 h-20 w-3 rounded-full bg-gradient-to-b from-blue-400 to-purple-500 opacity-70" />
-        <div className="absolute -right-8 top-4 h-20 w-3 rounded-full bg-gradient-to-b from-blue-400 to-purple-500 opacity-70" />
+        <div className="robot-antenna absolute -left-8 top-4 h-20 w-3 rounded-full bg-gradient-to-b from-blue-400 to-purple-500 opacity-70" />
+        <div
+          className="robot-antenna absolute -right-8 top-4 h-20 w-3 rounded-full bg-gradient-to-b from-blue-400 to-purple-500 opacity-70"
+          style={{ animationDelay: '2.25s' }}
+        />
       </div>
       <div className="absolute inset-0">
+        <div
+          className="hero-beam-shift absolute h-60 w-20 rotate-12 rounded-full bg-gradient-to-b from-cyan-300/55 via-transparent to-transparent blur-3xl mix-blend-screen"
+          style={{ left: '-4rem', top: '1rem' }}
+        />
+        <div
+          className="hero-beam-sweep absolute h-72 w-24 -rotate-6 rounded-full bg-gradient-to-b from-purple-400/55 via-transparent to-transparent blur-[70px] mix-blend-screen"
+          style={{ right: '-4.5rem', top: '2.5rem' }}
+        />
         {bubbles.map((bubble, idx) => (
           <span
             key={idx}

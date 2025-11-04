@@ -1,3 +1,85 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes heroBeamShift {
+  0% {
+    transform: translate3d(0, -240px, 0) scale(0.75);
+    opacity: 0.08;
+  }
+  50% {
+    transform: translate3d(0, 240px, 0) scale(1.2);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(0, -240px, 0) scale(0.75);
+    opacity: 0.08;
+  }
+}
+
+@keyframes heroBeamSweep {
+  0% {
+    transform: translate3d(0, 200px, 0) scaleX(0.8);
+    opacity: 0.12;
+  }
+  50% {
+    transform: translate3d(0, -280px, 0) scaleX(1.25);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(0, 200px, 0) scaleX(0.8);
+    opacity: 0.12;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes antennaPulse {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-6px) scaleY(1.05);
+    opacity: 0.95;
+  }
+}
+
+.hero-beam-shift {
+  animation: heroBeamShift 6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.hero-beam-sweep {
+  animation: heroBeamSweep 7.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.robot-antenna {
+  animation: antennaPulse 4.5s ease-in-out infinite;
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+}
