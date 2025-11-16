@@ -1,9 +1,7 @@
 import { Hero } from '../components/ui/Hero'
+import { CTASection } from '../components/ui/CTASection'
 import { FeatureCards } from '../components/ui/FeatureCards'
 import { WorkflowTimeline } from '../components/ui/WorkflowTimeline'
-import { AboutMetrics } from '../components/ui/AboutMetrics'
-import { Testimonial } from '../components/ui/Testimonial'
-import { CTASection } from '../components/ui/CTASection'
 
 function Home() {
   return (
@@ -11,8 +9,6 @@ function Home() {
       <Hero />
       <FeatureCards />
       <WorkflowTimeline />
-      <AboutMetrics />
-      <Testimonial />
       <CTASection />
     </div>
   )
