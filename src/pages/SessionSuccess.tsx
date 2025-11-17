@@ -66,7 +66,7 @@ const promptMarkdownComponents: Components = {
   li: ({ node, ...props }) => (
     <li className="leading-relaxed" {...props} />
   ),
-  code: ({ node, inline, className, children, ...props }) =>
+  code: ({ node, inline, className, children, ...props }: any) =>
     inline ? (
       <code className="rounded bg-slate-800/80 px-1 py-0.5 text-cyan-200" {...props}>
         {children}
