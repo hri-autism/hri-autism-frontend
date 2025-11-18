@@ -18,16 +18,21 @@ type SessionResponse = {
   created_at: string
 }
 
+type LatestSessionResponse = SessionResponse | null
+
 type UseSessionResult = {
   createSession: (payload: SessionPayload) => Promise<SessionResponse>
   getSession: (sessionId: string) => Promise<SessionResponse>
+  getLatestSession: (childId: string) => Promise<LatestSessionResponse>
   isSubmitting: boolean
+  isFetching: boolean
   error: string | null
   clearError: () => void
 }
 
 export function useSession(): UseSessionResult {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const createSession = useCallback(async (payload: SessionPayload) => {
@@ -48,7 +53,7 @@ export function useSession(): UseSessionResult {
   }, [])
 
   const getSession = useCallback(async (sessionId: string) => {
-    setIsSubmitting(true)
+    setIsFetching(true)
     setError(null)
     try {
       return await request<SessionResponse>(`/api/sessions/${sessionId}`)
@@ -57,7 +62,23 @@ export function useSession(): UseSessionResult {
       setError(message)
       throw err
     } finally {
-      setIsSubmitting(false)
+      setIsFetching(false)
+    }
+  }, [])
+
+  const getLatestSession = useCallback(async (childId: string) => {
+    setIsFetching(true)
+    setError(null)
+    try {
+      return await request<LatestSessionResponse>(
+        `/api/children/${childId}/sessions/latest`,
+      )
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      setError(message)
+      throw err
+    } finally {
+      setIsFetching(false)
     }
   }, [])
 
@@ -66,7 +87,9 @@ export function useSession(): UseSessionResult {
   return {
     createSession,
     getSession,
+    getLatestSession,
     isSubmitting,
+    isFetching,
     error,
     clearError,
   }

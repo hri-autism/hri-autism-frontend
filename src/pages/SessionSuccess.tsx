@@ -46,7 +46,6 @@ function humanize(option: string) {
 const MAX_AUTO_RETRIES = 3
 
 const typewriterFallback = 'Preparing prompt...'
-
 const promptMarkdownComponents: Components = {
   p: ({ node, ...props }) => (
     <p className="mb-3 text-slate-100 last:mb-0" {...props} />
@@ -95,7 +94,7 @@ function SessionSuccess() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const {
     getSession,
-    isSubmitting: isLoading,
+    isFetching: isLoading,
     error: remoteError,
     clearError,
   } = useSession()
@@ -289,6 +288,7 @@ function SessionSuccess() {
             error={childError}
           />
 
+
           <Card
             tone="dark"
             title="Today’s context"
@@ -320,16 +320,6 @@ function SessionSuccess() {
                 >
                   {copied ? 'Copied' : 'Copy prompt'}
                 </Button>
-                <Link
-                  to={
-                    session
-                      ? `/session/new?child_id=${encodeURIComponent(session.child_id)}`
-                      : '/session/new'
-                  }
-                  className={buttonClasses({ variant: 'ghost' })}
-                >
-                  Start another session
-                </Link>
               </div>
             }
           >

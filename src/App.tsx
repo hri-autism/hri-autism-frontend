@@ -5,6 +5,7 @@ import SessionNew from './pages/SessionNew'
 import SessionSuccess from './pages/SessionSuccess'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 
 function App() {
@@ -32,6 +33,14 @@ function App() {
         element={
           <ProtectedRoute>
             <SessionSuccess />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
           </ProtectedRoute>
         }
       />

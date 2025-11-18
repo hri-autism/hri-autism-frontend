@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
@@ -18,8 +18,10 @@ import {
   PageContainer,
   SectionHeader,
   StatusBanner,
+  Tag,
   buttonClasses,
 } from '../components/ui'
+import { useChildrenList, type ChildListItem } from '../hooks/useChild'
 
 type FormState = {
   mood: string
@@ -69,12 +71,33 @@ const CROWD_OPTIONS = ENVIRONMENT_CROWD.map((value) => ({
 function SessionNew() {
   const [searchParams] = useSearchParams()
   const childId = searchParams.get('child_id')?.trim() ?? ''
-
+  const { children, isLoading: isLoadingChildren, error: childrenError, refresh } = useChildrenList()
+  const [selectedChildId, setSelectedChildId] = useState(childId)
   const [form, setForm] = useState<FormState>(initialState)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const { createSession, isSubmitting, error, clearError } = useSession()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setSelectedChildId(childId)
+  }, [childId])
+
+  useEffect(() => {
+    if (isLoadingChildren) return
+    if (!childId && children.length === 0) {
+      navigate('/child/new', { replace: true, state: { from: '/session/new' } })
+      return
+    }
+    if (!childId && children.length === 1) {
+      setSelectedChildId(children[0].child_id)
+    }
+  }, [childId, children, isLoadingChildren, navigate])
+
+  const selectedChild = useMemo(
+    () => children.find((child) => child.child_id === selectedChildId) ?? null,
+    [children, selectedChildId],
+  )
 
   const handleChange = useCallback(
     (
@@ -104,7 +127,7 @@ function SessionNew() {
       event.preventDefault()
       clearError()
 
-      if (!childId) {
+      if (!selectedChildId) {
         setFieldErrors({})
         setFormError('Missing child_id. Please create a child profile first.')
         return
@@ -148,7 +171,7 @@ function SessionNew() {
 
       try {
         const session = await createSession({
-          child_id: childId,
+          child_id: selectedChildId,
           mood: form.mood,
           environment: [form.location, form.noise, form.crowd].join(','),
           situation: trimmedSituation,
@@ -163,7 +186,7 @@ function SessionNew() {
         }
       }
     },
-    [childId, clearError, createSession, form, navigate],
+    [clearError, createSession, form, navigate, selectedChildId],
   )
 
   const handleReset = useCallback(() => {
@@ -176,7 +199,7 @@ function SessionNew() {
   const disableSubmit = useMemo(() => {
     return (
       isSubmitting ||
-      !childId ||
+      !selectedChildId ||
       !form.mood ||
       !form.location ||
       !form.noise ||
@@ -184,9 +207,39 @@ function SessionNew() {
       !form.situation.trim() ||
       Object.keys(fieldErrors).length > 0
     )
-  }, [childId, fieldErrors, form, isSubmitting])
+  }, [fieldErrors, form, isSubmitting, selectedChildId])
 
-  const feedback = formError ?? error
+  const feedback = formError ?? error ?? childrenError ?? null
+
+  const handleChildSelect = useCallback((targetId: string) => {
+    setSelectedChildId(targetId)
+  }, [])
+
+  const renderChildSummary = (child: ChildListItem) => {
+    const chips = [
+      { label: 'Comm', value: child.comm_level },
+      { label: 'Personality', value: child.personality },
+      { label: 'Age', value: `${child.age}` },
+    ]
+    return (
+      <div className="space-y-2 text-sm text-slate-100">
+        <p className="text-base font-semibold text-cyan-200">{child.nickname}</p>
+        <div className="flex flex-wrap gap-2">
+          {chips.map((chip) => (
+            <Tag key={chip.label} variant="environment">
+              {chip.label}: {chip.value}
+            </Tag>
+          ))}
+        </div>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+          child_id
+        </p>
+        <p className="font-mono text-xs text-slate-300 break-all">
+          {child.child_id}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <PageContainer variant="dark" contentClassName="space-y-12">
@@ -201,17 +254,10 @@ function SessionNew() {
         description="Sessions are tied to an existing child profile."
         tone="dark"
       >
-        {childId ? (
-          <div className="space-y-3 text-sm text-slate-200/90">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                child_id
-              </p>
-              <p className="font-mono text-base text-cyan-200 break-words">
-                {childId}
-              </p>
-            </div>
-          </div>
+        {isLoadingChildren ? (
+          <LoadingOverlay tone="dark">Loading children...</LoadingOverlay>
+        ) : selectedChild ? (
+          renderChildSummary(selectedChild)
         ) : (
           <EmptyState
             title="No child selected"
@@ -223,12 +269,45 @@ function SessionNew() {
                 href: '/child/new',
                 variant: 'primary',
               },
+              {
+                label: 'Refresh',
+                onClick: () => refresh(),
+                variant: 'secondary',
+              },
             ]}
           />
         )}
       </Card>
 
-      {childId && (
+      {children.length > 1 ? (
+        <Card
+          title="Pick a child for today"
+          description="Choose which child this new session belongs to."
+          tone="dark"
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            {children.map((child) => {
+              const isActive = child.child_id === selectedChildId
+              return (
+                <button
+                  key={child.child_id}
+                  type="button"
+                  onClick={() => handleChildSelect(child.child_id)}
+                  className={`rounded-2xl border px-4 py-4 text-left transition ${
+                    isActive
+                      ? 'border-cyan-300 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.4)]'
+                      : 'border-white/10 hover:border-cyan-200/60'
+                  }`}
+                >
+                  {renderChildSummary(child)}
+                </button>
+              )
+            })}
+          </div>
+        </Card>
+      ) : null}
+
+      {selectedChild && (
         <form onSubmit={handleSubmit} className="relative space-y-10">
           {isSubmitting ? (
             <LoadingOverlay tone="dark">Generating prompt...</LoadingOverlay>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { request } from '../lib/api'
 
 type CreateChildPayload = {
@@ -24,11 +24,35 @@ type ChildResponse = {
   updated_at: string
 }
 
+type ChildListItem = {
+  child_id: string
+  nickname: string
+  age: number
+  comm_level: string
+  personality: string
+  triggers: string
+  interests: string
+  target_skills: string
+  created_at: string
+  updated_at: string
+}
+
+type ChildrenListResponse = {
+  children: ChildListItem[]
+}
+
 type UseChildResult = {
   createChild: (payload: CreateChildPayload) => Promise<ChildResponse>
   isSubmitting: boolean
   error: string | null
   clearError: () => void
+}
+
+type UseChildrenListResult = {
+  children: ChildListItem[]
+  isLoading: boolean
+  error: string | null
+  refresh: () => Promise<void>
 }
 
 export function useChild(): UseChildResult {
@@ -62,3 +86,40 @@ export function useChild(): UseChildResult {
     clearError,
   }
 }
+
+export function useChildrenList(autoFetch = true): UseChildrenListResult {
+  const [children, setChildren] = useState<ChildListItem[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const refresh = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const data = await request<ChildrenListResponse>('/api/children')
+      setChildren(Array.isArray(data.children) ? data.children : [])
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load children.'
+      setError(message)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!autoFetch) return
+    refresh().catch(() => {
+      /* handled */
+    })
+  }, [autoFetch, refresh])
+
+  return {
+    children,
+    isLoading,
+    error,
+    refresh,
+  }
+}
+
+export type { ChildListItem }

@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Hero } from '../components/ui/Hero'
 import { CTASection } from '../components/ui/CTASection'
 import { FeatureCards } from '../components/ui/FeatureCards'
 import { WorkflowTimeline } from '../components/ui/WorkflowTimeline'
-import { buttonClasses, Button } from '../components/ui'
+import { buttonClasses } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 
 function Home() {
   const { status, isAuthenticated, user, logout } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
+
   const handleLogout = useCallback(() => {
     const shouldLogout = window.confirm('Are you sure you want to sign out?')
     if (shouldLogout) {
@@ -18,7 +20,7 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <header className="sticky top-0 z-20 border-b border-white/5 bg-slate-950/80 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-white/5 bg-slate-950/80 backdrop-blur" onMouseLeave={() => setMenuOpen(false)}>
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
           <Link
             to="/"
@@ -30,14 +32,48 @@ function Home() {
             {status === 'checking' ? (
               <span className="text-slate-400">Validating session...</span>
             ) : isAuthenticated ? (
-              <>
-                <span className="hidden text-slate-300 sm:inline-flex">
-                  Hello, <span className="ml-1 font-semibold">{user?.full_name}</span>
-                </span>
-                <Button size="sm" variant="secondary" onClick={handleLogout}>
-                  Sign out
-                </Button>
-              </>
+              <div className="relative">
+                <div className="flex items-center gap-2 rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-cyan-900/30 px-4 py-2 text-sm font-semibold tracking-wide text-cyan-100 transition hover:border-cyan-300 hover:text-white">
+                  <span className="inline-flex h-5 w-5 items-start justify-start">
+                    <span className="inline-block h-3 w-3 border-t-2 border-l-2 border-cyan-200" />
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen((prev) => !prev)}
+                    className="flex items-center gap-2"
+                  >
+                    <span>Hello, {user?.full_name ?? 'User'}</span>
+                    <span className="inline-flex h-5 w-5 items-center justify-center">
+                      <span
+                        className={`inline-block h-3 w-3 border-b-2 border-r-2 border-cyan-200 transition-transform ${
+                        menuOpen ? 'rotate-45' : '-rotate-135'
+                      }`}
+                    />
+                  </span>
+                  </button>
+                </div>
+                {menuOpen ? (
+                  <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-cyan-400/30 bg-gradient-to-b from-slate-950/95 via-slate-900/90 to-slate-950/80 p-3">
+                    <Link
+                      to="/dashboard"
+                      className="block rounded-xl px-4 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/10 hover:text-white"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      className="mt-2 block w-full rounded-xl border border-rose-400/30 px-4 py-2 text-left text-sm font-semibold text-rose-200 transition hover:bg-rose-500/10"
+                      onClick={() => {
+                        setMenuOpen(false)
+                        handleLogout()
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             ) : (
               <>
                 <Link

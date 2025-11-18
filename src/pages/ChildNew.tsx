@@ -2,16 +2,19 @@ import { useCallback, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { COMM_LEVELS, PERSONALITIES } from '../lib/constants'
-import { useChild } from '../hooks/useChild'
+import { useChild, useChildrenList, type ChildListItem } from '../hooks/useChild'
 import { Select, TextArea, TextInput } from '../components/form'
 import {
   Button,
+  Card,
   LoadingOverlay,
   FormSection,
   PageContainer,
   SectionHeader,
   StatusBanner,
+  Tag,
   buttonClasses,
+  EmptyState,
 } from '../components/ui'
 
 type FormState = {
@@ -51,7 +54,13 @@ function ChildNew() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const { createChild, isSubmitting, error, clearError } = useChild()
+  const {
+    children,
+    isLoading: childrenLoading,
+    error: childrenError,
+  } = useChildrenList()
   const navigate = useNavigate()
+  const hasChildren = children.length > 0
 
   const handleChange = useCallback(
     (
@@ -183,6 +192,48 @@ function ChildNew() {
 
   const feedback = formError ?? error
 
+  const renderChildCard = useCallback(
+    (child: ChildListItem) => (
+      <Card
+        key={child.child_id}
+        tone="dark"
+        title={child.nickname}
+        description={`child_id: ${child.child_id}`}
+      >
+        <div className="space-y-3 text-sm text-slate-100">
+          <div className="flex flex-wrap gap-2">
+            <Tag variant="environment">Age: {child.age}</Tag>
+            <Tag variant="environment">Comm: {child.comm_level}</Tag>
+            <Tag variant="environment">Personality: {child.personality}</Tag>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+              Interests
+            </p>
+            <p className="font-mono text-xs text-slate-300 break-words">
+              {child.interests || 'N/A'}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to={`/session/new?child_id=${encodeURIComponent(child.child_id)}`}
+              className={buttonClasses({ size: 'sm' })}
+            >
+              Create session
+            </Link>
+            <Link
+              to={`/session/new`}
+              className={buttonClasses({ size: 'sm', variant: 'secondary' })}
+            >
+              Change child
+            </Link>
+          </div>
+        </div>
+      </Card>
+    ),
+    [],
+  )
+
   return (
     <PageContainer variant="dark" contentClassName="space-y-12">
       <SectionHeader
@@ -198,6 +249,38 @@ function ChildNew() {
           </span>
         }
       />
+
+      {childrenLoading ? (
+        <StatusBanner variant="loading">Loading existing child profiles...</StatusBanner>
+      ) : childrenError ? (
+        <StatusBanner variant="error">{childrenError}</StatusBanner>
+      ) : hasChildren ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Existing children</h2>
+              <p className="text-sm text-slate-400">
+                Review current profiles before adding another.
+              </p>
+            </div>
+            <Link
+              to="/session/new"
+              className={buttonClasses({ variant: 'ghost', size: 'sm' })}
+            >
+              Go to sessions
+            </Link>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {children.map((child) => renderChildCard(child))}
+          </div>
+        </div>
+      ) : (
+        <EmptyState
+          tone="dark"
+          title="No child profiles yet"
+          description="Fill out the form below to create your first child profile. We’ll automatically take you to the session flow afterward."
+        />
+      )}
 
       <form onSubmit={handleSubmit} className="relative space-y-10">
         {isSubmitting ? (
