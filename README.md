@@ -1,5 +1,6 @@
 # Autism Companion Frontend
-Generating daily robot interaction prompts for autism children.
+Generating daily robot interaction prompts for autism children.  
+
 Vite + React + TypeScript + Tailwind UI for the Frontend.
 
 ## Routes
