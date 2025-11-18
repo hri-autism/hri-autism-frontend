@@ -1,4 +1,4 @@
-# Autism Companion Frontend
+# HRI Autism Frontend
 Generating daily robot interaction prompts for autism children.  
 
 Vite + React + TypeScript + Tailwind UI for the Frontend.
