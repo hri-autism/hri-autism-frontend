@@ -3,6 +3,7 @@ import type {
   ButtonHTMLAttributes,
   ReactNode,
 } from 'react'
+import { Link } from 'react-router-dom'
 import { Spinner } from './Spinner'
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost'
@@ -79,8 +80,8 @@ export function Button({
 
   if (as === 'link') {
     return (
-      <a
-        href={href}
+      <Link
+        to={href ?? '#'}
         className={composedClassName}
         aria-disabled={isDisabled || undefined}
         {...rest}
@@ -93,7 +94,7 @@ export function Button({
         }}
       >
         {content}
-      </a>
+      </Link>
     )
   }
 
