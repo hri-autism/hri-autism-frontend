@@ -127,40 +127,31 @@ export function KeywordSummary({ child, loading, error }: KeywordSummaryProps) {
         </div>
 
         <div
-          className="relative hidden w-full max-w-[220px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-slate-950/60 px-5 pb-5 pt-4 shadow-[0_30px_90px_rgba(56,189,248,0.16)] md:flex md:h-full md:self-stretch md:flex-col md:items-center"
+          className="relative hidden w-full max-w-[220px] md:flex md:h-full md:self-stretch md:flex-col md:items-center"
           aria-hidden="true"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_65%)] animate-[robotAuraPulse_8s_ease-in-out_infinite]" />
-          <div className="absolute inset-4 rounded-[36%] border border-cyan-300/20 animate-[robotAuraPulse_9s_ease-in-out_infinite_reverse]" />
-          <div className="absolute inset-x-8 top-0 h-28 overflow-hidden">
-            <span className="absolute left-1/2 h-44 w-14 -translate-x-1/2 rounded-full bg-gradient-to-b from-cyan-400/40 via-cyan-300/15 to-transparent blur-2xl animate-[robotCircuitSweep_6s_linear_infinite]" />
-          </div>
-          <div className="absolute -left-5 top-6 h-22 w-2 rounded-full bg-gradient-to-b from-cyan-400/40 to-purple-400/20 blur-md animate-[robotAuraPulse_5s_ease-in-out_infinite]" />
-          <div className="absolute -right-5 top-24 h-18 w-2 rounded-full bg-gradient-to-t from-purple-400/40 to-cyan-400/20 blur-md animate-[robotAuraPulse_7s_ease-in-out_infinite]" />
-
-          <div className="relative flex h-full w-full flex-col justify-between">
-            <div className="flex flex-col items-center gap-3 pt-1">
-              <div className="flex h-16 w-24 items-center justify-center rounded-[48%] border border-cyan-300/40 bg-slate-900/80 shadow-[0_0_32px_rgba(56,189,248,0.28)]">
-                <div className="relative flex h-10 w-[72px] items-center justify-between px-3">
-                  <span className="h-3 w-3 rounded-full bg-cyan-200/80 shadow-[0_0_12px_rgba(56,189,248,0.7)] animate-pulse" />
-                  <span className="h-3 w-3 rounded-full bg-purple-200/80 shadow-[0_0_12px_rgba(147,51,234,0.6)] animate-[robotAuraPulse_4.5s_ease-in-out_infinite]" />
-                </div>
+          <div className="relative flex h-full w-full flex-col items-center justify-center">
+            <div className="relative flex h-28 w-20 flex-col items-center animate-[float_7s_ease-in-out_infinite]">
+              <div className="relative h-8 w-12 rounded-full border border-slate-200 bg-white/80 shadow-[0_5px_15px_rgba(56,189,248,0.2)]">
+                <span className="absolute left-1/2 top-1/2 flex h-1 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-between">
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-900/70 animate-pulse" />
+                  <span className="h-0.5 w-4 rounded-full bg-slate-900/40" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-900/70 animate-pulse" />
+                </span>
               </div>
-              <div className="flex h-1 w-16 items-center justify-center gap-2">
-                <span className="h-1 w-8 rounded-full bg-gradient-to-r from-cyan-400/60 to-transparent" />
-                <span className="h-1 w-8 rounded-full bg-gradient-to-l from-purple-400/60 to-transparent" />
+              <div className="relative mt-2 h-16 w-14 rounded-[36%] border border-slate-200 bg-white/70 shadow-[0_10px_25px_rgba(59,130,246,0.2)]">
+                <span className="absolute -left-4 top-4 h-6 w-4 rounded-full border border-slate-200/40 bg-white/40 animate-[float_6s_ease-in-out_infinite]" />
+                <span className="absolute -right-4 top-4 h-6 w-4 rounded-full border border-slate-200/40 bg-white/40 animate-[float_6s_ease-in-out_infinite_reverse]" />
+                <span className="absolute bottom-2 left-1/2 h-6 w-10 -translate-x-1/2 rounded-full border border-slate-200/80 bg-slate-50/60" />
+              </div>
+              <div className="relative mt-2 flex w-16 justify-between">
+                <span className="h-4 w-5 rounded-full border border-slate-200/30 bg-white/40" />
+                <span className="h-4 w-5 rounded-full border border-slate-200/30 bg-white/40" />
               </div>
             </div>
-            <div className="flex flex-1 items-center justify-center">
-              <div className="flex h-14 w-7 items-center justify-center rounded-full border border-cyan-300/30 bg-slate-900/70 shadow-[0_0_20px_rgba(56,189,248,0.22)]">
-                <div className="h-10 w-1 rounded-full bg-gradient-to-b from-cyan-300/70 to-purple-400/60 animate-[robotCircuitSweep_8s_linear_infinite]" />
-              </div>
-            </div>
-            <div className="flex flex-1 items-end justify-center pb-1">
-              <div className="flex h-8 w-24 items-center justify-center gap-3 rounded-full border border-cyan-400/40 bg-slate-900/75 px-4 text-[9px] uppercase tracking-[0.4em] text-cyan-200 animate-[robotBadgePulse_5.5s_ease-in-out_infinite]">
-                <span>bot</span>
-                <span>link</span>
-              </div>
+            <div className="mt-4 flex h-1 w-16 items-center justify-center gap-2 opacity-60">
+              <span className="h-1 w-7 rounded-full bg-gradient-to-r from-cyan-300/40 to-transparent" />
+              <span className="h-1 w-7 rounded-full bg-gradient-to-l from-purple-300/40 to-transparent" />
             </div>
           </div>
         </div>
