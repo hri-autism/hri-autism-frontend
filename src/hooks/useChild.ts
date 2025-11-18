@@ -52,6 +52,7 @@ type UseChildrenListResult = {
   children: ChildListItem[]
   isLoading: boolean
   error: string | null
+  hasLoaded: boolean
   refresh: () => Promise<void>
 }
 
@@ -91,6 +92,7 @@ export function useChildrenList(autoFetch = true): UseChildrenListResult {
   const [children, setChildren] = useState<ChildListItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [hasLoaded, setHasLoaded] = useState(false)
 
   const refresh = useCallback(async () => {
     setIsLoading(true)
@@ -104,6 +106,7 @@ export function useChildrenList(autoFetch = true): UseChildrenListResult {
       throw err
     } finally {
       setIsLoading(false)
+      setHasLoaded(true)
     }
   }, [])
 
@@ -118,6 +121,7 @@ export function useChildrenList(autoFetch = true): UseChildrenListResult {
     children,
     isLoading,
     error,
+    hasLoaded,
     refresh,
   }
 }

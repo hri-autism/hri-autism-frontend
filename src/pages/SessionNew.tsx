@@ -71,28 +71,50 @@ const CROWD_OPTIONS = ENVIRONMENT_CROWD.map((value) => ({
 function SessionNew() {
   const [searchParams] = useSearchParams()
   const childId = searchParams.get('child_id')?.trim() ?? ''
-  const { children, isLoading: isLoadingChildren, error: childrenError, refresh } = useChildrenList()
-  const [selectedChildId, setSelectedChildId] = useState(childId)
+  const {
+    children,
+    isLoading: isLoadingChildren,
+    error: childrenError,
+    hasLoaded: hasLoadedChildren,
+    refresh,
+  } = useChildrenList()
+  const [selectedChildId, setSelectedChildId] = useState(childId || '')
   const [form, setForm] = useState<FormState>(initialState)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const { createSession, isSubmitting, error, clearError } = useSession()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    setSelectedChildId(childId)
-  }, [childId])
+  const latestChildId = useMemo(() => {
+    if (!children.length) return null
+    const latest = [...children].reduce<ChildListItem | null>((acc, child) => {
+      const currentTs = new Date(child.updated_at ?? child.created_at ?? 0).getTime()
+      if (!acc) {
+        return child
+      }
+      const accTs = new Date(acc.updated_at ?? acc.created_at ?? 0).getTime()
+      return currentTs > accTs ? child : acc
+    }, null)
+    return latest?.child_id ?? children[0].child_id
+  }, [children])
 
   useEffect(() => {
-    if (isLoadingChildren) return
-    if (!childId && children.length === 0) {
+    if (isLoadingChildren || !hasLoadedChildren) return
+    if (children.length === 0) {
       navigate('/child/new', { replace: true, state: { from: '/session/new' } })
       return
     }
-    if (!childId && children.length === 1) {
-      setSelectedChildId(children[0].child_id)
+    if (childId) {
+      setSelectedChildId(childId)
+      return
     }
-  }, [childId, children, isLoadingChildren, navigate])
+    setSelectedChildId((prev) => {
+      if (prev && children.some((child) => child.child_id === prev)) {
+        return prev
+      }
+      return latestChildId ?? children[0].child_id
+    })
+  }, [childId, children, hasLoadedChildren, isLoadingChildren, latestChildId, navigate])
 
   const selectedChild = useMemo(
     () => children.find((child) => child.child_id === selectedChildId) ?? null,
