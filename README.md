@@ -1,10 +1,12 @@
-# HRI Autism Frontend
+# Autism Companion Frontend
+Generating daily robot interaction prompts for autism children.
+Vite + React + TypeScript + Tailwind UI for the Frontend.
 
-A Vite + React + TypeScript + Tailwind CSS frontend that works with the HRI autism backend to generate daily robot interaction prompts for children.
+## Routes
 
-## Routes (no-auth milestone)
-
-- `/` – Home page with project overview and primary actions.
-- `/child/new` – Create a child profile. On success the app redirects to `/session/new?child_id=<UUID>`.
-- `/session/new?child_id=...` – Daily session form that submits mood, environment, and situation to generate a prompt.
-- `/session/success/:sessionId` – Read-only prompt viewer with an option to start another session.
+- `/` – Landing page (hero, CTA, workflow steps).
+- `/dashboard` – Authenticated home showing user info + child cards + latest sessions.
+- `/login`, `/register` – Auth flows (JWT, LoadingOverlay states).
+- `/child/new` – Create child profiles and review existing ones.
+- `/session/new` – Daily session form (auto-select latest child, picker when many).
+- `/session/success/:id` – Prompt recap page for the created session.
