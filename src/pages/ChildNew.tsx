@@ -194,12 +194,7 @@ function ChildNew() {
 
   const renderChildCard = useCallback(
     (child: ChildListItem) => (
-      <Card
-        key={child.child_id}
-        tone="dark"
-        title={child.nickname}
-        description={`child_id: ${child.child_id}`}
-      >
+      <Card key={child.child_id} tone="dark" title={child.nickname}>
         <div className="space-y-3 text-sm text-slate-100">
           <div className="flex flex-wrap gap-2">
             <Tag variant="environment">Age: {child.age}</Tag>
@@ -211,7 +206,23 @@ function ChildNew() {
               Interests
             </p>
             <p className="font-mono text-xs text-slate-300 break-words">
-              {child.interests || 'N/A'}
+              {child.interests ? child.interests.split(',').join(' • ') : 'N/A'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+              Triggers
+            </p>
+            <p className="font-mono text-xs text-slate-300 break-words">
+              {child.triggers ? child.triggers.split(',').join(' • ') : 'N/A'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+              Target skills
+            </p>
+            <p className="font-mono text-xs text-slate-300 break-words">
+              {child.target_skills ? child.target_skills.split(',').join(' • ') : 'N/A'}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -220,12 +231,6 @@ function ChildNew() {
               className={buttonClasses({ size: 'sm' })}
             >
               Create session
-            </Link>
-            <Link
-              to={`/session/new`}
-              className={buttonClasses({ size: 'sm', variant: 'secondary' })}
-            >
-              Change child
             </Link>
           </div>
         </div>
@@ -256,19 +261,11 @@ function ChildNew() {
         <StatusBanner variant="error">{childrenError}</StatusBanner>
       ) : hasChildren ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Existing children</h2>
-              <p className="text-sm text-slate-400">
-                Review current profiles before adding another.
-              </p>
-            </div>
-            <Link
-              to="/session/new"
-              className={buttonClasses({ variant: 'ghost', size: 'sm' })}
-            >
-              Go to sessions
-            </Link>
+          <div>
+            <h2 className="text-lg font-semibold text-white">Existing children</h2>
+            <p className="text-sm text-slate-400">
+              Review current profiles before adding another.
+            </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
             {children.map((child) => renderChildCard(child))}

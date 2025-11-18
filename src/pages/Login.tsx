@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, type FormEvent, type ChangeEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { PageContainer, SectionHeader, StatusBanner, Button } from '../components/ui'
+import { PageContainer, SectionHeader, StatusBanner, Button, LoadingOverlay } from '../components/ui'
 import { TextInput } from '../components/form'
 import { request, ApiError } from '../lib/api'
 import { useAuth, type AuthUser } from '../context/AuthContext'
@@ -166,7 +166,10 @@ function Login() {
         title="Welcome back"
         description="Sign in with your registered email to access your dashboard."
       />
-      <div className="space-y-8 rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur">
+      <div className="relative space-y-8 rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur">
+        {isSubmitting ? (
+          <LoadingOverlay tone="dark" label="Signing in..." />
+        ) : null}
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <TextInput
             tone="dark"

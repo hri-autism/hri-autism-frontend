@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Hero } from '../components/ui/Hero'
 import { CTASection } from '../components/ui/CTASection'
 import { FeatureCards } from '../components/ui/FeatureCards'
@@ -10,6 +10,24 @@ import { useAuth } from '../context/AuthContext'
 function Home() {
   const { status, isAuthenticated, user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isPointerDevice, setIsPointerDevice] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia === 'undefined') {
+      return
+    }
+    const media = window.matchMedia('(pointer: fine)')
+    const update = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsPointerDevice(event.matches)
+    }
+    update(media)
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', update)
+      return () => media.removeEventListener('change', update)
+    }
+    media.addListener(update as any)
+    return () => media.removeListener(update as any)
+  }, [])
 
   const handleLogout = useCallback(() => {
     const shouldLogout = window.confirm('Are you sure you want to sign out?')
@@ -20,7 +38,10 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <header className="sticky top-0 z-20 border-b border-white/5 bg-slate-950/80 backdrop-blur" onMouseLeave={() => setMenuOpen(false)}>
+      <header
+        className="sticky top-0 z-20 border-b border-white/5 bg-slate-950/80 backdrop-blur"
+        onMouseLeave={isPointerDevice ? () => setMenuOpen(false) : undefined}
+      >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
           <Link
             to="/"

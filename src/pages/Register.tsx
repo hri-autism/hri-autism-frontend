@@ -7,7 +7,7 @@ import {
   type FormEvent,
 } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { PageContainer, SectionHeader, StatusBanner, Button } from '../components/ui'
+import { PageContainer, SectionHeader, StatusBanner, Button, LoadingOverlay } from '../components/ui'
 import { Select, TextInput } from '../components/form'
 import { request } from '../lib/api'
 import { useAuth, type AuthUser } from '../context/AuthContext'
@@ -172,7 +172,10 @@ function Register() {
         title="Create an account"
         description="Register to add child profiles, create sessions, and track their progress."
       />
-      <div className="space-y-8 rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur">
+      <div className="relative space-y-8 rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur">
+        {isSubmitting ? (
+          <LoadingOverlay tone="dark" label="Creating account..." />
+        ) : null}
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <TextInput
             tone="dark"

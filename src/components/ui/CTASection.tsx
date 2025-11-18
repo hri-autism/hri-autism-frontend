@@ -20,7 +20,7 @@ export function CTASection() {
               Ready to sync your robot with real-time empathy?
             </h2>
             <p className="text-base text-slate-200/80 md:text-lg">
-              Build a baseline profile or jump straight into today’s session. Your robot will respond with sharper context every time.
+              Capture a child baseline and keep logging daily sessions.
             </p>
             <div className="flex flex-col justify-center gap-4 pt-2 sm:flex-row">
               <Button as="link" href="/session/new" size="md" className="px-6">

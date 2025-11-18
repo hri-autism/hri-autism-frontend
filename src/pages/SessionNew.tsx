@@ -243,22 +243,40 @@ function SessionNew() {
       { label: 'Personality', value: child.personality },
       { label: 'Age', value: `${child.age}` },
     ]
+
+    const formatList = (value?: string) => {
+      if (!value) return 'N/A'
+      const items = value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)
+      return items.length ? items.join(' • ') : 'N/A'
+    }
+
     return (
-      <div className="space-y-2 text-sm text-slate-100">
-        <p className="text-base font-semibold text-cyan-200">{child.nickname}</p>
-        <div className="flex flex-wrap gap-2">
-          {chips.map((chip) => (
-            <Tag key={chip.label} variant="environment">
-              {chip.label}: {chip.value}
-            </Tag>
-          ))}
+      <div className="space-y-3 text-sm text-slate-100">
+        <div>
+          <p className="text-base font-semibold text-cyan-200">{child.nickname}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {chips.map((chip) => (
+              <Tag key={chip.label} variant="environment">
+                {chip.label}: {chip.value}
+              </Tag>
+            ))}
+          </div>
         </div>
-        <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-          child_id
-        </p>
-        <p className="font-mono text-xs text-slate-300 break-all">
-          {child.child_id}
-        </p>
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Interests</p>
+          <p className="font-mono text-xs text-slate-300">{formatList(child.interests)}</p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Triggers</p>
+          <p className="font-mono text-xs text-slate-300">{formatList(child.triggers)}</p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Target skills</p>
+          <p className="font-mono text-xs text-slate-300">{formatList(child.target_skills)}</p>
+        </div>
       </div>
     )
   }
@@ -271,11 +289,7 @@ function SessionNew() {
         description="Provide the child’s current mood, environment, and situation so the robot can respond empathetically."
       />
 
-      <Card
-        title="Selected child"
-        description="Sessions are tied to an existing child profile."
-        tone="dark"
-      >
+      <Card title="Selected child" tone="dark">
         {isLoadingChildren ? (
           <LoadingOverlay tone="dark">Loading children...</LoadingOverlay>
         ) : selectedChild ? (

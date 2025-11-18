@@ -357,7 +357,7 @@ const promptPreviewComponents = {
               </div>
               <Link
                 to="/child/new"
-                className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-6 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300 hover:text-white"
+                className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-cyan-100 transition hover:border-cyan-300 hover:text-white sm:px-6 sm:text-sm sm:tracking-[0.3em]"
               >
                 Add child
               </Link>
@@ -398,9 +398,10 @@ const promptPreviewComponents = {
         />
         <Link
           to="/"
-          className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-6 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300 hover:text-white"
+          className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-cyan-100 transition hover:border-cyan-300 hover:text-white sm:px-6 sm:text-sm sm:tracking-[0.3em]"
         >
-          Back to home
+          <span className="sm:hidden">Back</span>
+          <span className="hidden sm:inline">Back to home</span>
         </Link>
      </div>
       {content}
