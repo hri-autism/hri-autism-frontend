@@ -45,9 +45,10 @@ function Home() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
           <Link
             to="/"
-            className="text-lg font-semibold tracking-[0.3em] text-cyan-200"
+            className="whitespace-nowrap text-base font-semibold tracking-[0.25em] text-cyan-200 md:text-lg md:tracking-[0.3em]"
           >
-            AUTISM COMPANION
+            <span className="md:hidden">AUTISM CARE</span>
+            <span className="hidden md:inline">AUTISM COMPANION</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             {status === 'checking' ? (

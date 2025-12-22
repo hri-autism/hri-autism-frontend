@@ -26,16 +26,32 @@ export function Hero() {
           style={{ transform: `translateY(${offsetY * -0.2}px)` }}
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-32 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-xl space-y-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-8 px-4 pb-10 pt-12 md:gap-16 md:px-6 md:pb-24 md:pt-32 lg:flex-row lg:items-center lg:justify-between">
+        <div className="max-w-[18rem] space-y-6 text-center md:max-w-xl md:space-y-8 md:text-left">
           <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.3em] text-cyan-200">
-            AI + emotion-aware prompts
+            <span className="md:hidden">AI-led prompts</span>
+            <span className="hidden md:inline">AI + emotion-aware prompts</span>
           </span>
           <h1 className="text-4xl font-semibold leading-tight text-white md:text-5xl lg:text-6xl">
-            Guide your social robot with <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">real-time empathy</span>
+            <span className="md:hidden">
+              Guide your social robot with
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                real-time care
+              </span>
+            </span>
+            <span className="hidden md:inline">
+              Guide your robot with{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                real-time empathy
+              </span>
+            </span>
           </h1>
           <p className="text-lg text-slate-200/90">
-            Parents and therapists collaborate to give the robot just-in-time context, so every interaction feels warm, attentive, and aligned with the child's needs.
+            <span className="md:hidden">Share context so every interaction stays calm and attentive.</span>
+            <span className="hidden md:inline">
+              Parents and therapists collaborate to give the robot just-in-time context, so every interaction feels
+              warm and attentive.
+            </span>
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button as="link" href="/session/new" size="lg">
@@ -46,7 +62,7 @@ export function Hero() {
             </Button>
           </div>
         </div>
-        <div className="relative flex h-[26rem] w-full max-w-md items-center justify-center">
+        <div className="relative hidden h-[26rem] w-full max-w-md items-center justify-center lg:flex">
           <div
             className="absolute inset-0 rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-slate-900/60 to-slate-900/30 shadow-[0_40px_120px_rgba(56,189,248,0.25)]"
             style={{ transform: `translateY(${offsetY * -0.2}px)` }}
@@ -54,7 +70,7 @@ export function Hero() {
           <RobotIllustration />
         </div>
       </div>
-      <div className="relative z-10 flex items-center justify-center pb-12">
+      <div className="relative z-10 flex items-center justify-center pb-8 md:pb-12">
         <a
           href="#features"
           className="flex flex-col items-center gap-3 text-slate-300/80 transition hover:text-cyan-200"
