@@ -17,14 +17,29 @@ export function CTASection() {
               stay in sync
             </span>
             <h2 className="text-3xl font-semibold text-white md:text-4xl">
-              Ready to sync your robot with real-time empathy?
+            <span className="md:hidden">
+              Ready to guide your robot with
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                real-time care?
+              </span>
+            </span>
+            <span className="hidden md:block">
+              Ready to synchronize your robot
+              <span className="block">
+                with{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                  real-time empathy
+                </span>
+                ?
+              </span>
+            </span>
             </h2>
             <p className="text-base text-slate-200/80 md:text-lg">
               Capture a child baseline and keep logging daily sessions.
             </p>
             <div className="flex flex-col justify-center gap-4 pt-2 sm:flex-row">
               <Button as="link" href="/session/new" size="md" className="px-6">
-                Start a session
+                Start a new session
               </Button>
               <Button
                 as="link"
