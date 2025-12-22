@@ -5,7 +5,7 @@ const features = [
   {
     title: 'Personalized prompts',
     description:
-      'OpenAI-backed keyword filtering distills raw parent notes into structured robot instructions.',
+      'AI-backed keyword filtering distills raw parent notes into structured robot instructions.',
     tag: 'Context aware',
   },
   {
@@ -26,7 +26,7 @@ export function FeatureCards() {
   return (
     <section
       id="features"
-      className="mx-auto grid max-w-6xl gap-6 px-6 py-16 md:grid-cols-3"
+      className="mx-auto hidden max-w-6xl grid-cols-1 gap-6 px-6 py-16 md:grid md:grid-cols-3"
     >
       {features.map((feature) => (
         <Card

@@ -4,7 +4,7 @@ const steps = [
   {
     title: 'Create child profile',
     description:
-      'Capture the child’s long-term preferences, triggers, and skill goals so the robot has a reliable baseline.',
+      'Capture child’s long-term preferences, triggers, and skill goals so the robot has a reliable baseline.',
   },
   {
     title: 'Fill out the daily session form',
