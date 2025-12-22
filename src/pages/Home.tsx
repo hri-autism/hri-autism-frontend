@@ -101,21 +101,23 @@ function Home() {
                   to="/login"
                   className={buttonClasses({
                     variant: 'ghost',
-                    size: 'sm',
-                    className: 'text-sm font-semibold text-cyan-100',
+                    size: 'md',
+                    className: 'text-base font-semibold text-cyan-100',
                   })}
                 >
-                  Sign in
+                  <span className="sm:hidden">Login</span>
+                  <span className="hidden sm:inline">Sign in</span>
                 </Link>
                 <Link
                   to="/register"
                   className={buttonClasses({
                     variant: 'primary',
-                    size: 'sm',
-                    className: 'text-sm',
+                    size: 'md',
+                    className: 'text-base',
                   })}
                 >
-                  Create account
+                  <span className="sm:hidden">Register</span>
+                  <span className="hidden sm:inline">Create account</span>
                 </Link>
               </>
             )}
