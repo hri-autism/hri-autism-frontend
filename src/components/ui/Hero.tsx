@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from './Button'
 import { RobotIllustration, heroBackgroundStyles } from './RobotIllustration'
 
@@ -12,6 +12,15 @@ export function Hero() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const handleScrollClick = useCallback(() => {
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches
+    const targetId = isDesktop ? 'features' : 'workflow'
+    const target = document.getElementById(targetId)
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [])
 
   return (
@@ -71,15 +80,16 @@ export function Hero() {
         </div>
       </div>
       <div className="relative z-10 flex items-center justify-center pb-8 md:pb-12">
-        <a
-          href="#features"
+        <button
+          type="button"
+          onClick={handleScrollClick}
           className="flex flex-col items-center gap-3 text-slate-300/80 transition hover:text-cyan-200"
         >
           <span className="text-xs uppercase tracking-[0.4em]">Scroll</span>
           <span className="flex h-14 w-8 items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/40">
             <span className="inline-block h-2 w-2 animate-bounce rounded-full bg-cyan-300" />
           </span>
-        </a>
+        </button>
       </div>
     </section>
   )

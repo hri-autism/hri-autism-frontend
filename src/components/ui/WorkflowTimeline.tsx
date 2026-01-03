@@ -20,7 +20,7 @@ const steps = [
 
 export function WorkflowTimeline() {
   return (
-    <section className="relative mx-auto max-w-4xl px-6 py-16">
+    <section id="workflow" className="relative mx-auto max-w-4xl px-6 py-16">
       <div className="absolute left-5 top-16 bottom-16 hidden w-px bg-gradient-to-b from-cyan-400/40 to-purple-500/40 md:block" />
       <div className="space-y-10">
         {steps.map((step, index) => (
