@@ -7,7 +7,15 @@ import {
   type FormEvent,
 } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { PageContainer, SectionHeader, StatusBanner, Button, LoadingOverlay } from '../components/ui'
+import {
+  PageContainer,
+  SectionHeader,
+  StatusBanner,
+  Button,
+  LoadingOverlay,
+  buttonClasses,
+} from '../components/ui'
+import { heroBackgroundStyles } from '../components/ui/RobotIllustration'
 import { Select, TextInput } from '../components/form'
 import { request } from '../lib/api'
 import { useAuth, type AuthUser } from '../context/AuthContext'
@@ -166,38 +174,100 @@ function Register() {
   }
 
   return (
-    <PageContainer variant="dark" contentClassName="space-y-12">
-      <SectionHeader
-        tone="dark"
-        title="Create an account"
-        description="Register to add child profiles, create sessions, and track their progress."
+    <section className={`${heroBackgroundStyles} min-h-screen`}>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-1/3 -top-1/4 h-[60vh] w-[60vw] rounded-full bg-gradient-to-br from-cyan-400/40 via-purple-500/30 to-blue-500/40 blur-3xl" />
+        <div className="absolute right-[-10%] top-1/3 h-[50vh] w-[40vw] rounded-full bg-gradient-to-br from-blue-500/40 to-purple-500/40 blur-3xl" />
+      </div>
+      <div className="relative z-10">
+        <header className="sticky top-0 z-20 border-b border-white/5 bg-slate-950/80 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
+            <Link
+              to="/"
+              className="whitespace-nowrap text-base font-semibold tracking-[0.25em] text-cyan-200 md:text-lg md:tracking-[0.3em]"
+            >
+              <span className="md:hidden">AUTISM CARE</span>
+              <span className="hidden md:inline">AUTISM COMPANION</span>
+            </Link>
+            <div className="flex items-center gap-3 text-sm">
+              <Link
+                to="/login"
+                className={buttonClasses({
+                  variant: 'ghost',
+                  size: 'md',
+                  className: 'text-base font-semibold text-cyan-100',
+                })}
+              >
+                <span className="sm:hidden">Login</span>
+                <span className="hidden sm:inline">Sign in</span>
+              </Link>
+              <Link
+                to="/register"
+                className={buttonClasses({
+                  variant: 'primary',
+                  size: 'md',
+                  className: 'text-base',
+                })}
+              >
+                <span className="sm:hidden">Register</span>
+                <span className="hidden sm:inline">Create account</span>
+              </Link>
+            </div>
+          </div>
+        </header>
+        <PageContainer
+          variant="dark"
+          className="bg-transparent text-white"
+          contentClassName="space-y-12"
+        >
+          <SectionHeader
+            tone="dark"
+            align="center"
+            titleClassName="text-4xl md:text-5xl"
+            descriptionClassName="text-base md:text-lg"
+          title={
+            <>
+              Create{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                Account
+              </span>
+            </>
+          }
+        description={
+          <>
+            <span className="md:hidden">
+              Register to add profiles, sessions, and track progress.
+            </span>
+            <span className="hidden md:inline">
+              Register to add child profiles, create sessions, and track their progress.
+            </span>
+          </>
+        }
       />
       <div className="relative space-y-8 rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur">
         {isSubmitting ? (
           <LoadingOverlay tone="dark" label="Creating account..." />
         ) : null}
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-          <TextInput
-            tone="dark"
-            label="Full name"
-            name="full_name"
-            placeholder="Alice Chen"
-            value={form.full_name}
-            onChange={handleChange}
-            autoComplete="name"
-            error={fieldErrors.full_name}
-          />
-          <TextInput
-            tone="dark"
-            label="Email"
-            name="email"
-            type="email"
-            placeholder="parent@example.com"
-            value={form.email}
-            onChange={handleChange}
-            autoComplete="email"
-            error={fieldErrors.email}
-          />
+            <TextInput
+              tone="dark"
+              label="Full name"
+              name="full_name"
+              value={form.full_name}
+              onChange={handleChange}
+              autoComplete="name"
+              error={fieldErrors.full_name}
+            />
+            <TextInput
+              tone="dark"
+              label="Email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              autoComplete="email"
+              error={fieldErrors.email}
+            />
           <TextInput
             tone="dark"
             label="Password"
@@ -212,13 +282,13 @@ function Register() {
           <Select
             tone="dark"
             label="Role"
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            options={ROLE_OPTIONS}
-            placeholder="Select a role"
-            error={fieldErrors.role}
-          />
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              options={ROLE_OPTIONS}
+              placeholder="Select a role"
+              error={fieldErrors.role}
+            />
           {formError ? (
             <StatusBanner variant="error">{formError}</StatusBanner>
           ) : null}
@@ -243,7 +313,9 @@ function Register() {
           </Link>
         </div>
       </div>
-    </PageContainer>
+        </PageContainer>
+      </div>
+    </section>
   )
 }
 

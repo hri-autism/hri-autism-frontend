@@ -6,6 +6,8 @@ type SectionHeaderProps = {
   align?: 'left' | 'center'
   className?: string
   tone?: 'light' | 'dark'
+  titleClassName?: string
+  descriptionClassName?: string
 }
 
 export function SectionHeader({
@@ -14,6 +16,8 @@ export function SectionHeader({
   align = 'left',
   tone = 'light',
   className = '',
+  titleClassName = '',
+  descriptionClassName = '',
 }: SectionHeaderProps) {
   const alignment =
     align === 'center' ? 'text-center items-center' : 'text-left items-start'
@@ -24,9 +28,11 @@ export function SectionHeader({
     <header
       className={`flex flex-col gap-4 ${alignment} ${className}`}
     >
-      <h1 className={`text-3xl font-semibold ${titleClass}`}>{title}</h1>
+      <h1 className={`text-3xl font-semibold ${titleClass} ${titleClassName}`}>{title}</h1>
       {description ? (
-        <p className={`max-w-3xl text-base ${descriptionClass}`}>{description}</p>
+        <p className={`max-w-3xl text-base ${descriptionClass} ${descriptionClassName}`}>
+          {description}
+        </p>
       ) : null}
     </header>
   )

@@ -47,7 +47,7 @@ function Home() {
             to="/"
             className="whitespace-nowrap text-base font-semibold tracking-[0.25em] text-cyan-200 md:text-lg md:tracking-[0.3em]"
           >
-            <span className="md:hidden">AUTISM CARE</span>
+            <span className="md:hidden">Autism Care</span>
             <span className="hidden md:inline">AUTISM COMPANION</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
