@@ -2,9 +2,9 @@ import { Button } from './Button'
 
 export function CTASection() {
   return (
-    <section className="relative py-20">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_70%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(79,70,229,0.15)_0%,rgba(56,189,248,0.08)_45%,rgba(14,116,144,0.04)_100%)]" />
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#0F172A] via-[#0E1628] to-[#0B1120] py-20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(56,189,248,0.14),transparent_55%),radial-gradient(circle_at_72%_24%,rgba(139,92,246,0.12),transparent_55%),radial-gradient(circle_at_20%_78%,rgba(139,92,246,0.1),transparent_58%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,rgba(56,189,248,0.12)_0%,rgba(99,102,241,0.14)_50%,rgba(56,189,248,0.08)_100%)]" />
 
       <div className="relative mx-auto max-w-4xl px-6">
         <div className="relative overflow-hidden rounded-3xl border border-cyan-400/30 bg-slate-950/70 p-12 text-center shadow-[0_45px_140px_rgba(56,189,248,0.25)] backdrop-blur-xl">

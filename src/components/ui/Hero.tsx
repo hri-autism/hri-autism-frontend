@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Button } from './Button'
 import { RobotIllustration, heroBackgroundStyles } from './RobotIllustration'
 
-export function Hero() {
+type HeroProps = {
+  topSlot?: ReactNode
+}
+
+export function Hero({ topSlot }: HeroProps) {
   const [offsetY, setOffsetY] = useState(0)
 
   useEffect(() => {
@@ -25,7 +29,8 @@ export function Hero() {
 
   return (
     <section className={`${heroBackgroundStyles}`}>
-      <div className="absolute inset-0 overflow-hidden">
+      {topSlot ? <div className="relative z-20 h-0 w-full">{topSlot}</div> : null}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute -left-1/3 -top-1/4 h-[60vh] w-[60vw] rounded-full bg-gradient-to-br from-cyan-400/40 via-purple-500/30 to-blue-500/40 blur-3xl"
           style={{ transform: `translateY(${offsetY * 0.4}px)` }}
@@ -35,7 +40,7 @@ export function Hero() {
           style={{ transform: `translateY(${offsetY * -0.2}px)` }}
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-8 px-4 pb-10 pt-12 md:gap-16 md:px-6 md:pb-24 md:pt-32 lg:flex-row lg:items-center lg:justify-between">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-8 px-4 pb-10 pt-28 md:gap-16 md:px-6 md:pb-24 md:pt-36 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-[18rem] space-y-6 text-center md:max-w-xl md:space-y-8 md:text-left">
           <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.3em] text-cyan-200">
             <span className="md:hidden">AI-led prompts</span>

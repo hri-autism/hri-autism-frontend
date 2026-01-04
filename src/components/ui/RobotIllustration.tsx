@@ -75,7 +75,7 @@ export function RobotIllustration() {
 }
 
 export const heroBackgroundStyles = `
-  relative flex flex-col overflow-hidden bg-gradient-to-b from-[#0F172A] via-[#111827] to-[#0B1120] text-white md:min-h-screen
+  relative flex flex-col bg-gradient-to-b from-[#0F172A] via-[#111827] to-[#0B1120] text-white md:min-h-screen
   before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.25),_transparent_60%)]
   after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(120deg,rgba(139,92,246,0.15)_0%,rgba(56,189,248,0.05)_100%)]
 `
