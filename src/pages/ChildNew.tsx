@@ -393,7 +393,7 @@ function ChildNew() {
               rows={4}
               value={form.triggers_raw}
               onChange={handleChange}
-              placeholder="e.g., Avoid hospital or doctors."x
+              placeholder="e.g., Avoid hospital or doctors."
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.triggers_raw ?? null}

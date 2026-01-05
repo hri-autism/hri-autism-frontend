@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ENVIRONMENT_CROWD,
   ENVIRONMENT_LOCATIONS,
@@ -19,9 +19,10 @@ import {
   SectionHeader,
   StatusBanner,
   Tag,
-  buttonClasses,
 } from '../components/ui'
 import { useChildrenList, type ChildListItem } from '../hooks/useChild'
+import { TopBar } from '../components/layout/TopBar'
+import { heroBackgroundStyles } from '../components/ui/RobotIllustration'
 
 type FormState = {
   mood: string
@@ -174,10 +175,11 @@ function SessionNew() {
       }
 
       const trimmedSituation = form.situation.trim()
+      const wordCount = trimmedSituation ? trimmedSituation.split(/\s+/).filter(Boolean).length : 0
       if (!trimmedSituation) {
         newErrors.situation = 'Situation detail is required'
-      } else if (trimmedSituation.length < 20) {
-        newErrors.situation = 'Please provide at least 20 characters so the robot has enough context'
+      } else if (wordCount < 4) {
+        newErrors.situation = 'Please provide at least 4 words so the robot has enough context'
       } else if (trimmedSituation.length > 800) {
         newErrors.situation = 'Situation must be 800 characters or less'
       }
@@ -239,9 +241,9 @@ function SessionNew() {
 
   const renderChildSummary = (child: ChildListItem) => {
     const chips = [
+      { label: 'Age', value: `${child.age}` },
       { label: 'Comm', value: child.comm_level },
       { label: 'Personality', value: child.personality },
-      { label: 'Age', value: `${child.age}` },
     ]
 
     const formatList = (value?: string) => {
@@ -258,9 +260,29 @@ function SessionNew() {
         <div>
           <p className="text-base font-semibold text-cyan-200">{child.nickname}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {chips.map((chip) => (
-              <Tag key={chip.label} variant="environment">
-                {chip.label}: {chip.value}
+                {chips.map((chip) => (
+                  <Tag key={chip.label} variant="environment">
+                {chip.label === 'Comm' ? (
+                  <>
+                    <span className="md:hidden">
+                      Comm: {chip.value === 'medium' ? 'med' : chip.value}
+                    </span>
+                    <span className="hidden md:inline">
+                      {chip.label}: {chip.value}
+                    </span>
+                  </>
+                ) : chip.label === 'Personality' ? (
+                  <>
+                    <span className="md:hidden">
+                      Pers: {chip.value === 'curious' ? 'cur' : chip.value}
+                    </span>
+                    <span className="hidden md:inline">
+                      {chip.label}: {chip.value}
+                    </span>
+                  </>
+                ) : (
+                  `${chip.label}: ${chip.value}`
+                )}
               </Tag>
             ))}
           </div>
@@ -282,170 +304,200 @@ function SessionNew() {
   }
 
   return (
-    <PageContainer variant="dark" contentClassName="space-y-12">
-      <SectionHeader
-        tone="dark"
-        title="Create Daily Session"
-        description="Provide the child’s current mood, environment, and situation so the robot can respond empathetically."
-      />
-
-      <Card title="Selected child" tone="dark">
-        {isLoadingChildren ? (
-          <LoadingOverlay tone="dark">Loading children...</LoadingOverlay>
-        ) : selectedChild ? (
-          renderChildSummary(selectedChild)
-        ) : (
-          <EmptyState
-            title="No child selected"
-            description="Create a child profile first so we can attach the daily session to the right person."
+    <section className={`${heroBackgroundStyles} overflow-visible min-h-screen`}>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-1/3 -top-1/4 h-[60vh] w-[60vw] rounded-full bg-gradient-to-br from-cyan-400/40 via-purple-500/30 to-blue-500/40 blur-3xl" />
+        <div className="absolute right-[-10%] top-1/3 h-[50vh] w-[40vw] rounded-full bg-gradient-to-br from-blue-500/40 to-purple-500/40 blur-3xl" />
+      </div>
+      <div className="relative z-10">
+        <TopBar variant="transparent" />
+        <PageContainer variant="dark" contentClassName="space-y-12" className="bg-transparent text-white">
+          <SectionHeader
             tone="dark"
-            actions={[
-              {
-                label: 'Create child profile',
-                href: '/child/new',
-                variant: 'primary',
-              },
-              {
-                label: 'Refresh',
-                onClick: () => refresh(),
-                variant: 'secondary',
-              },
-            ]}
+            align="center"
+            titleClassName="text-4xl md:text-5xl"
+            descriptionClassName="text-base md:text-lg"
+            title={
+              <>
+                Create{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                  Daily Session
+                </span>
+              </>
+            }
+            description={
+              <>
+                <span className="md:hidden">Provide the child’s current situation.</span>
+                <span className="hidden md:inline">
+                  Provide the child’s current situation so the robot can respond empathetically.
+                </span>
+              </>
+            }
           />
-        )}
-      </Card>
 
-      {children.length > 1 ? (
-        <Card
-          title="Pick a child for today"
-          description="Choose which child this new session belongs to."
-          tone="dark"
-        >
-          <div className="grid gap-4 md:grid-cols-2">
-            {children.map((child) => {
-              const isActive = child.child_id === selectedChildId
-              return (
-                <button
-                  key={child.child_id}
-                  type="button"
-                  onClick={() => handleChildSelect(child.child_id)}
-                  className={`rounded-2xl border px-4 py-4 text-left transition ${
-                    isActive
-                      ? 'border-cyan-300 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.4)]'
-                      : 'border-white/10 hover:border-cyan-200/60'
-                  }`}
-                >
-                  {renderChildSummary(child)}
-                </button>
-              )
-            })}
-          </div>
-        </Card>
-      ) : null}
+          <Card title="Selected Child" tone="dark">
+            {isLoadingChildren ? (
+              <LoadingOverlay tone="dark">Loading children...</LoadingOverlay>
+            ) : selectedChild ? (
+              renderChildSummary(selectedChild)
+            ) : (
+              <EmptyState
+                title="No child selected"
+                description="Create a child profile first so we can attach the daily session to the right person."
+                tone="dark"
+                actions={[
+                  {
+                    label: 'Create child profile',
+                    href: '/child/new',
+                    variant: 'primary',
+                  },
+                  {
+                    label: 'Refresh',
+                    onClick: () => refresh(),
+                    variant: 'secondary',
+                  },
+                ]}
+              />
+            )}
+          </Card>
 
-      {selectedChild && (
-        <form onSubmit={handleSubmit} className="relative space-y-10">
-          {isSubmitting ? (
-            <LoadingOverlay tone="dark">Generating prompt...</LoadingOverlay>
-          ) : feedback ? (
-            <StatusBanner variant="error">{feedback}</StatusBanner>
+          {children.length > 1 ? (
+            <Card
+              title="Pick a Child for Today"
+              description="Choose which child new session belongs to."
+              tone="dark"
+            >
+              <div className="grid gap-4 md:grid-cols-2">
+                {children.map((child) => {
+                  const isActive = child.child_id === selectedChildId
+                  return (
+                    <button
+                      key={child.child_id}
+                      type="button"
+                      onClick={() => handleChildSelect(child.child_id)}
+                      className={`rounded-2xl border px-4 py-4 text-left transition ${
+                        isActive
+                          ? 'border-cyan-300 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.4)]'
+                          : 'border-white/10 hover:border-cyan-200/60'
+                      }`}
+                    >
+                      {renderChildSummary(child)}
+                    </button>
+                  )
+                })}
+              </div>
+            </Card>
           ) : null}
 
-          <FormSection
-            title="Mood & environment"
-            description="Help the robot understand how the child feels and what the setting looks like today."
+          {selectedChild && (
+            <form onSubmit={handleSubmit} className="relative space-y-10">
+              {isSubmitting ? (
+                <LoadingOverlay tone="dark">Generating prompt...</LoadingOverlay>
+              ) : feedback ? (
+                <StatusBanner variant="error">{feedback}</StatusBanner>
+              ) : null}
+
+              <FormSection
+                title="Mood & Environment"
+            description={
+              <>
+                <span className="md:hidden">Child mood and setting today.</span>
+                <span className="hidden md:inline">
+                  Help the robot understand how the child feels and what the setting looks like today.
+                </span>
+              </>
+            }
             tone="dark"
           >
-            <div className="grid gap-6 md:grid-cols-2">
-              <Select
-                label="Mood"
-                name="mood"
-                value={form.mood}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={MOOD_OPTIONS}
-                disabled={isSubmitting}
-                error={fieldErrors.mood ?? null}
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Select
+                    label="Mood"
+                    name="mood"
+                    value={form.mood}
+                    onChange={handleChange}
+                    placeholder="Select an option"
+                    options={MOOD_OPTIONS}
+                    disabled={isSubmitting}
+                    error={fieldErrors.mood ?? null}
+                    tone="dark"
+                  />
+
+                  <Select
+                    label="Location"
+                    name="location"
+                    value={form.location}
+                    onChange={handleChange}
+                    placeholder="Select an option"
+                    options={LOCATION_OPTIONS}
+                    disabled={isSubmitting}
+                    error={fieldErrors.location ?? null}
+                    tone="dark"
+                  />
+
+                  <Select
+                    label="Noise Level"
+                    name="noise"
+                    value={form.noise}
+                    onChange={handleChange}
+                    placeholder="Select an option"
+                    options={NOISE_OPTIONS}
+                    disabled={isSubmitting}
+                    error={fieldErrors.noise ?? null}
+                    tone="dark"
+                  />
+
+                  <Select
+                    label="Crowd Density"
+                    name="crowd"
+                    value={form.crowd}
+                    onChange={handleChange}
+                    placeholder="Select an option"
+                    options={CROWD_OPTIONS}
+                    disabled={isSubmitting}
+                    error={fieldErrors.crowd ?? null}
+                    tone="dark"
+                  />
+                </div>
+              </FormSection>
+
+              <FormSection
+                title="Situation Context"
+                description="Share what happened today, any energy shifts, or specifics the robot should mention."
                 tone="dark"
-              />
+              >
+                <TextArea
+                  label="Situation"
+                  name="situation"
+                  rows={6}
+                  maxLength={800}
+                  value={form.situation}
+                  onChange={handleChange}
+                  placeholder="e.g., He skipped breakfast this morning and seems less focused than usual. He’s been rubbing his eyes and responding slowly. The robot should keep sentences short and allow extra time for responses."
+                  hint="Provide at least 4 words, up to 800 characters."
+                  disabled={isSubmitting}
+                  error={fieldErrors.situation ?? null}
+                  tone="dark"
+                />
+              </FormSection>
 
-              <Select
-                label="Location"
-                name="location"
-                value={form.location}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={LOCATION_OPTIONS}
-                disabled={isSubmitting}
-                error={fieldErrors.location ?? null}
-                tone="dark"
-              />
-
-              <Select
-                label="Noise Level"
-                name="noise"
-                value={form.noise}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={NOISE_OPTIONS}
-                disabled={isSubmitting}
-                error={fieldErrors.noise ?? null}
-                tone="dark"
-              />
-
-              <Select
-                label="Crowd Density"
-                name="crowd"
-                value={form.crowd}
-                onChange={handleChange}
-                placeholder="Select an option"
-                options={CROWD_OPTIONS}
-                disabled={isSubmitting}
-                error={fieldErrors.crowd ?? null}
-                tone="dark"
-              />
-            </div>
-          </FormSection>
-
-          <FormSection
-            title="Situation context"
-            description="Share what happened today, any energy shifts, or specifics the robot should mention."
-            tone="dark"
-          >
-            <TextArea
-              label="Situation"
-              name="situation"
-              rows={6}
-              maxLength={800}
-              value={form.situation}
-              onChange={handleChange}
-              placeholder="Describe today's context in full sentences (<= 800 characters)."
-              hint="Focus on temporary context, energy level, recent events, or anything the robot should know today."
-              disabled={isSubmitting}
-              error={fieldErrors.situation ?? null}
-              tone="dark"
-            />
-          </FormSection>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button type="submit" loading={isSubmitting} disabled={disableSubmit}>
-              Generate Prompt
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleReset}
-              disabled={isSubmitting}
-            >
-              Reset
-            </Button>
-            <Link to="/" className={buttonClasses({ variant: 'ghost' })}>
-              Cancel and return home
-            </Link>
-          </div>
-        </form>
-      )}
-    </PageContainer>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button type="submit" loading={isSubmitting} disabled={disableSubmit}>
+                  Generate Prompt
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleReset}
+                  disabled={isSubmitting}
+                >
+                  Reset
+                </Button>
+              </div>
+            </form>
+          )}
+        </PageContainer>
+      </div>
+    </section>
   )
 }
 
