@@ -16,6 +16,8 @@ import {
   buttonClasses,
   EmptyState,
 } from '../components/ui'
+import { heroBackgroundStyles } from '../components/ui/RobotIllustration'
+import { TopBar } from '../components/layout/TopBar'
 
 type FormState = {
   nickname: string
@@ -102,8 +104,8 @@ function ChildNew() {
       const parsedAge = Number(form.age)
       if (!Number.isFinite(parsedAge) || !Number.isInteger(parsedAge)) {
         newErrors.age = 'Age must be a whole number'
-      } else if (parsedAge < 0 || parsedAge > 18) {
-        newErrors.age = 'Age must be between 0 and 18'
+      } else if (parsedAge < 1 || parsedAge > 18) {
+        newErrors.age = 'Age must be between 1 and 18'
       }
 
       if (!form.comm_level) {
@@ -198,8 +200,16 @@ function ChildNew() {
         <div className="space-y-3 text-sm text-slate-100">
           <div className="flex flex-wrap gap-2">
             <Tag variant="environment">Age: {child.age}</Tag>
-            <Tag variant="environment">Comm: {child.comm_level}</Tag>
-            <Tag variant="environment">Personality: {child.personality}</Tag>
+            <Tag variant="environment">
+              <span className="md:hidden">
+                Comm: {child.comm_level === 'medium' ? 'med' : child.comm_level}
+              </span>
+              <span className="hidden md:inline">Comm: {child.comm_level}</span>
+            </Tag>
+            <Tag variant="environment">
+              <span className="md:hidden">Personal: {child.personality}</span>
+              <span className="hidden md:inline">Personality: {child.personality}</span>
+            </Tag>
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
@@ -240,20 +250,40 @@ function ChildNew() {
   )
 
   return (
-    <PageContainer variant="dark" contentClassName="space-y-12">
-      <SectionHeader
-        tone="dark"
-        title="Create Child Profile"
-        description={
-          <span className="inline-flex items-center gap-2 whitespace-nowrap text-slate-300">
-            <span>Provide the child&apos;s baseline information to generate a unique</span>
-            <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-cyan-200">
-              child_id
-            </span>
-            <span>and reuse it for every future session.</span>
-          </span>
-        }
-      />
+    <section className={`${heroBackgroundStyles} overflow-visible min-h-screen`}>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-1/3 -top-1/4 h-[60vh] w-[60vw] rounded-full bg-gradient-to-br from-cyan-400/40 via-purple-500/30 to-blue-500/40 blur-3xl" />
+        <div className="absolute right-[-10%] top-1/3 h-[50vh] w-[40vw] rounded-full bg-gradient-to-br from-blue-500/40 to-purple-500/40 blur-3xl" />
+      </div>
+      <div className="relative z-10">
+        <TopBar variant="transparent" />
+        <PageContainer
+          variant="dark"
+          contentClassName="space-y-12"
+          className="bg-transparent text-white"
+        >
+          <SectionHeader
+            tone="dark"
+            align="center"
+            titleClassName="text-4xl md:text-5xl"
+            descriptionClassName="text-base md:text-lg"
+            title={
+              <>
+                Create{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                  Child Profile
+                </span>
+              </>
+            }
+            description={
+              <span className="text-slate-300">
+                <span className="md:hidden">Provide the child&apos;s baseline.</span>
+                <span className="hidden md:inline">
+                  Provide the child&apos;s baseline so every session can stay personalized.
+                </span>
+              </span>
+            }
+          />
 
       {childrenLoading ? (
         <StatusBanner variant="loading">Loading existing child profiles...</StatusBanner>
@@ -262,7 +292,7 @@ function ChildNew() {
       ) : hasChildren ? (
         <div className="space-y-4">
           <div>
-            <h2 className="text-lg font-semibold text-white">Existing children</h2>
+            <h2 className="text-lg font-semibold text-white">Existing Children</h2>
             <p className="text-sm text-slate-400">
               Review current profiles before adding another.
             </p>
@@ -289,8 +319,7 @@ function ChildNew() {
         ) : null}
 
       <FormSection
-        title="Child basics"
-        description="Nickname, age, communication level and personality help tailor the robot's tone."
+        title="Child Basics"
         tone="dark"
         className="shadow-[0_30px_80px_rgba(56,189,248,0.12)]"
       >
@@ -301,7 +330,7 @@ function ChildNew() {
               type="text"
               value={form.nickname}
               onChange={handleChange}
-              placeholder="e.g., Leo"
+              placeholder=""
               required
               maxLength={100}
               disabled={isSubmitting}
@@ -313,10 +342,10 @@ function ChildNew() {
               label="Age (years)"
               name="age"
               type="number"
-              min={0}
+              min={1}
               value={form.age}
               onChange={handleChange}
-              placeholder="e.g., 6"
+              placeholder="Age 1-18"
               required
               disabled={isSubmitting}
               error={fieldErrors.age ?? null}
@@ -352,8 +381,8 @@ function ChildNew() {
         </FormSection>
 
         <FormSection
-          title="Long-form context"
-          description="Required narratives that feed the child model and regenerate prompts when needed."
+          title="Long-form Context"
+          description="The system will extract the keywords."
           tone="dark"
           className="shadow-[0_30px_80px_rgba(56,189,248,0.12)]"
         >
@@ -364,8 +393,7 @@ function ChildNew() {
               rows={4}
               value={form.triggers_raw}
               onChange={handleChange}
-              placeholder="e.g., Avoid hospital or doctor stories; keep the volume low."
-              hint="Describe sensitive topics in full sentences. The backend will extract up to seven keywords."
+              placeholder="e.g., Avoid hospital or doctors."x
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.triggers_raw ?? null}
@@ -379,7 +407,7 @@ function ChildNew() {
               rows={4}
               value={form.interests_raw}
               onChange={handleChange}
-              placeholder="e.g., Dinosaurs, puzzles, blue toys help them relax."
+              placeholder="e.g., Like dinosaurs and puzzles."
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.interests_raw ?? null}
@@ -393,7 +421,7 @@ function ChildNew() {
               rows={4}
               value={form.target_skills_raw}
               onChange={handleChange}
-              placeholder="e.g., Practice asking for help, taking turns, sharing the toy car."
+              placeholder="e.g., Practice asking for help."
               disabled={isSubmitting}
               maxLength={800}
               error={fieldErrors.target_skills_raw ?? null}
@@ -415,12 +443,11 @@ function ChildNew() {
           >
             Reset
           </Button>
-          <Link to="/" className={buttonClasses({ variant: 'ghost' })}>
-            Cancel and return home
-          </Link>
         </div>
       </form>
-    </PageContainer>
+        </PageContainer>
+      </div>
+    </section>
   )
 }
 

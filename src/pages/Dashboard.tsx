@@ -103,10 +103,10 @@ const humanize = (value: string) =>
 
 const communicationLabel = (value: string) => {
   const lower = value.toLowerCase()
-  if (lower === 'medium') return 'med'
-  if (lower === 'high') return 'articulate'
-  if (lower === 'low') return 'inarticulate'
-  return humanize(value)
+  if (lower === 'high') return 'HIGH COMM'
+  if (lower === 'medium') return 'MEDIUM COMM'
+  if (lower === 'low') return 'LOW COMM'
+  return `${humanize(value).toUpperCase()} COMM`
 }
 
 const shortMood = (value: string) => {
@@ -184,14 +184,15 @@ const promptPreviewComponents = {
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start md:hidden">
                   <Tag
                     variant="baseline"
-                    className="text-[11px] leading-tight px-2 py-0.5 max-w-[220px] border-purple-400/30 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-blue-500/10 text-purple-100 text-center justify-center"
+                    className="text-[11px] leading-tight px-2 py-0.5 max-w-[230px] border-purple-400/30 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-blue-500/10 text-purple-100 text-center justify-center"
                   >
-                    {communicationLabel(child.comm_level)}
-                    {['medium'].includes(child.comm_level.toLowerCase()) ? ' communication' : ''}
+                    {child.comm_level.toLowerCase() === 'medium'
+                      ? 'MED COMMUNICATION'
+                      : `${humanize(child.comm_level).toUpperCase()} COMMUNICATION`}
                   </Tag>
                   <Tag
                     variant="baseline"
-                    className="text-[11px] leading-tight px-2 py-0.5 max-w-[220px] border-cyan-400/30 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 text-cyan-100 text-center justify-center"
+                    className="text-[11px] leading-tight px-2 py-0.5 max-w-[230px] border-cyan-400/30 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 text-cyan-100 text-center justify-center"
                   >
                     {child.personality} personality
                   </Tag>
@@ -199,11 +200,9 @@ const promptPreviewComponents = {
                 <div className="hidden md:flex">
                   <Tag
                     variant="baseline"
-                    className="w-full max-w-[410px] justify-center text-center text-[11px] leading-tight px-3 py-1 border-purple-400/30 bg-gradient-to-r from-purple-500/12 via-cyan-500/10 to-blue-500/12 text-purple-100"
+                    className="w-full max-w-[360px] justify-center text-center text-[11px] leading-tight px-3 py-1 border-purple-400/30 bg-gradient-to-r from-purple-500/12 via-cyan-500/10 to-blue-500/12 text-purple-100"
                   >
-                    {communicationLabel(child.comm_level)}
-                    {['medium'].includes(child.comm_level.toLowerCase()) ? ' communication' : ''} ·{' '}
-                    {child.personality} personality
+                    {communicationLabel(child.comm_level)} · {child.personality} personality
                   </Tag>
                 </div>
                 <div>
