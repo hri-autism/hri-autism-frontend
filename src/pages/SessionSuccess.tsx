@@ -5,16 +5,19 @@ import { request } from '../lib/api'
 import {
   Button,
   Card,
-  KeywordSummary,
   PageContainer,
   SectionHeader,
   StatusBanner,
   Tag,
   buttonClasses,
+  Spinner,
 } from '../components/ui'
+import { Baymax } from '../components/ui/Baymax'
 import { useTypewriter } from '../hooks/useTypewriter'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
+import { TopBar } from '../components/layout/TopBar'
+import { heroBackgroundStyles } from '../components/ui/RobotIllustration'
 
 type SessionDetail = {
   session_id: string
@@ -90,6 +93,41 @@ function PromptTypewriter({ text, speed = 3 }: { text: string; speed?: number })
   )
 }
 
+function TypewriterLine({
+  label,
+  text,
+  speed = 28,
+  loop = false,
+  loopDelay = 15000,
+  startDelay = 0,
+}: {
+  label: string
+  text: string
+  speed?: number
+  loop?: boolean
+  loopDelay?: number
+  startDelay?: number
+}) {
+  const fallback = 'None recorded yet'
+  const isFallback = !text || text === fallback
+  const display = useTypewriter(isFallback ? '' : text, {
+    speed,
+    loop: loop && !isFallback,
+    loopDelay,
+    startDelay,
+    fallback,
+  })
+
+  return (
+    <div className="space-y-1">
+      <p className="text-xs uppercase tracking-wide text-slate-400">{label}</p>
+      <p className="min-h-[1.6rem] text-sm leading-relaxed text-slate-200">
+        {display || '\u00A0'}
+      </p>
+    </div>
+  )
+}
+
 function SessionSuccess() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const {
@@ -106,6 +144,7 @@ function SessionSuccess() {
   const [childLoading, setChildLoading] = useState(false)
   const [childError, setChildError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false)
 
   const fetchSession = useCallback(
     async (targetId: string, { retry }: { retry: boolean }) => {
@@ -204,6 +243,42 @@ function SessionSuccess() {
     return session.environment.split(',').map((token) => humanize(token.trim()))
   }, [session])
 
+  const commLabel = useMemo(() => {
+    if (!childProfile?.comm_level) return ''
+    return `${humanize(childProfile.comm_level)} communication`
+  }, [childProfile?.comm_level])
+
+  const commLabelMobile = useMemo(() => {
+    if (!childProfile?.comm_level) return ''
+    const full = humanize(childProfile.comm_level)
+    const isMedium = full.toLowerCase() === 'medium'
+    return `${isMedium ? 'Med' : full} communication`
+  }, [childProfile?.comm_level])
+
+  const personalityLabel = useMemo(() => {
+    if (!childProfile?.personality) return ''
+    return `${humanize(childProfile.personality)} personality`
+  }, [childProfile?.personality])
+
+  const childSummary = useMemo(() => {
+    if (!childProfile) return null
+
+    const parse = (value: string) => {
+      const items = value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)
+      return items.length ? items.join(' • ') : 'None recorded yet'
+    }
+
+    return {
+      interests: parse(childProfile.interests),
+      triggers: parse(childProfile.triggers),
+      targetSkills: parse(childProfile.target_skills),
+      baseline: `${childProfile.comm_level} communication · ${childProfile.personality} personality`,
+    }
+  }, [childProfile])
+
   const createdAtDisplay = useMemo(() => {
     if (!session?.created_at) return ''
     return new Intl.DateTimeFormat('en-US', {
@@ -212,20 +287,45 @@ function SessionSuccess() {
     }).format(new Date(session.created_at))
   }, [session?.created_at])
 
-  return (
-    <PageContainer variant="dark" contentClassName="space-y-12">
-      <SectionHeader
-        tone="dark"
-        align="center"
-        title="Session prompt generated"
-        description="Keywords from the child profile and today’s context have been fused into a single robot-ready script."
-      />
+  useEffect(() => {
+    if (session && !errorMessage) {
+      setShowSuccessBanner(true)
+      const timer = window.setTimeout(() => setShowSuccessBanner(false), 8000)
+      return () => window.clearTimeout(timer)
+    }
+    return undefined
+  }, [session, errorMessage])
 
-      {session && !errorMessage ? (
-        <StatusBanner variant="success">
-          Prompt created at {createdAtDisplay}.
-        </StatusBanner>
-      ) : null}
+  return (
+    <section className={`${heroBackgroundStyles} overflow-visible min-h-screen`}>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-1/3 -top-1/4 h-[60vh] w-[60vw] rounded-full bg-gradient-to-br from-cyan-400/40 via-purple-500/30 to-blue-500/40 blur-3xl" />
+        <div className="absolute right-[-10%] top-1/3 h-[50vh] w-[40vw] rounded-full bg-gradient-to-br from-blue-500/40 to-purple-500/40 blur-3xl" />
+      </div>
+      <div className="relative z-10">
+        <TopBar variant="transparent" />
+        <PageContainer variant="dark" contentClassName="space-y-12" className="bg-transparent text-white">
+          <SectionHeader
+            tone="dark"
+            align="center"
+            titleClassName="text-4xl md:text-5xl"
+            descriptionClassName="text-base md:text-lg"
+            title={
+              <>
+                Session Prompt{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                  Generated
+                </span>
+              </>
+            }
+            description="Keywords from the child profile and session have been fused into a single robot-ready script."
+          />
+
+          {session && !errorMessage && showSuccessBanner ? (
+            <StatusBanner variant="success">
+              Prompt created at {createdAtDisplay}.
+            </StatusBanner>
+          ) : null}
 
       {errorMessage ? (
         <StatusBanner variant="error">{errorMessage}</StatusBanner>
@@ -248,53 +348,27 @@ function SessionSuccess() {
       ) : null}
 
       {session ? (
-        <div className="space-y-8">
+        <div className="space-y-6">
           <Card
             tone="dark"
-            title="Session overview"
-            description="Snapshot of the data that shaped today’s prompt."
+            title="Session Overview"
+            description="Mood, environment, and today’s situation."
           >
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
-                  session_id
-                </p>
-                <p className="font-mono text-sm text-cyan-200 break-words">
-                  {session.session_id}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-wide text-slate-400">
-                  child_id
-                </p>
-                <p className="font-mono text-sm text-cyan-200 break-words">
-                  {session.child_id}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Tag variant="mood">Mood: {humanize(session.mood)}</Tag>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+              <Tag variant="mood" className="w-full sm:w-auto">
+                <span className="md:hidden">Mood: {session.mood?.toLowerCase() === 'uncomfortable' ? 'Uncomfort' : humanize(session.mood)}</span>
+                <span className="hidden md:inline">Mood: {humanize(session.mood)}</span>
+              </Tag>
               {environmentChips.map((chip) => (
-                <Tag key={chip} variant="environment">
+                <Tag key={chip} variant="environment" className="w-full sm:w-auto">
                   {chip}
                 </Tag>
               ))}
             </div>
-          </Card>
-
-          <KeywordSummary
-            child={childProfile}
-            loading={childLoading}
-            error={childError}
-          />
-
-
-          <Card
-            tone="dark"
-            title="Today’s context"
-            description="A quick refresher of what you shared in the session form."
-          >
-            <div className="space-y-3">
+            <div className="space-y-3 pt-2">
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                Situation
+              </p>
               <div className="group relative max-h-32 overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/70 p-4 text-sm text-slate-200 transition-all duration-300 hover:max-h-[420px]">
                 <p className="whitespace-pre-wrap leading-relaxed">
                   {session.situation}
@@ -309,8 +383,59 @@ function SessionSuccess() {
 
           <Card
             tone="dark"
-            title="Robot prompt"
-            description="Copy and send to your social robot—this script combines profile keywords with today’s context."
+            title="From Child Profile"
+            description="Child’s baseline."
+          >
+            <div className="grid gap-4 md:grid-cols-[1fr,240px] md:items-start">
+              <div className="space-y-3">
+                {childLoading ? (
+                  <div className="flex items-center gap-3 text-sm text-slate-300">
+                    <Spinner size="sm" /> Loading keywords…
+                  </div>
+                ) : childError ? (
+                  <div className="text-sm text-red-400">{childError}</div>
+                ) : childSummary ? (
+                  <div className="space-y-3">
+                    <div className="hidden md:block">
+                      <Tag variant="baseline" className="text-[10px] justify-center text-center">
+                        {childSummary.baseline}
+                      </Tag>
+                    </div>
+                    <div className="flex flex-col gap-2 md:hidden">
+                    {commLabel ? (
+                        <Tag variant="baseline" className="text-[10px] justify-center text-center max-w-[220px]">
+                          {commLabelMobile}
+                        </Tag>
+                      ) : null}
+                      {personalityLabel ? (
+                        <Tag variant="baseline" className="text-[10px] justify-center text-center max-w-[220px]">
+                          {personalityLabel}
+                        </Tag>
+                      ) : null}
+                    </div>
+                    <TypewriterLine label="Interests" text={childSummary.interests} loop />
+                    <TypewriterLine label="Triggers" text={childSummary.triggers} loop startDelay={150} />
+                    <TypewriterLine
+                      label="Target skills"
+                      text={childSummary.targetSkills}
+                      loop
+                      startDelay={300}
+                    />
+                  </div>
+                ) : (
+                  <div className="text-sm text-slate-300/80">
+                    Keywords missing. Once the profile is processed, they will appear here.
+                  </div>
+                )}
+              </div>
+              <Baymax className="hidden md:flex" />
+            </div>
+          </Card>
+
+          <Card
+            tone="dark"
+            title="Robot Prompt"
+            description="Combines profile keywords with session."
             footer={
               <div className="flex flex-wrap items-center gap-3">
                 <Button
@@ -318,8 +443,19 @@ function SessionSuccess() {
                   variant="secondary"
                   onClick={handleCopyPrompt}
                 >
-                  {copied ? 'Copied' : 'Copy prompt'}
+                  {copied ? 'Copied' : 'Copy Prompt'}
                 </Button>
+                <Link
+                  to={
+                    session
+                      ? `/session/new?child_id=${encodeURIComponent(session.child_id)}`
+                      : '/session/new'
+                  }
+                  className={buttonClasses()}
+                >
+                  <span className="md:hidden">Start Another</span>
+                  <span className="hidden md:inline">Start Another Session</span>
+                </Link>
               </div>
             }
           >
@@ -348,22 +484,9 @@ function SessionSuccess() {
         </StatusBanner>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Link
-          to={
-            session
-              ? `/session/new?child_id=${encodeURIComponent(session.child_id)}`
-              : '/session/new'
-          }
-          className={buttonClasses()}
-        >
-          Start another session
-        </Link>
-        <Link to="/" className={buttonClasses({ variant: 'secondary' })}>
-          Back to home
-        </Link>
+        </PageContainer>
       </div>
-    </PageContainer>
+    </section>
   )
 }
 
