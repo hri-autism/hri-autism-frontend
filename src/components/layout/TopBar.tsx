@@ -12,6 +12,7 @@ export function TopBar({ variant = 'solid' }: TopBarProps) {
   const { status, isAuthenticated, user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [isPointerDevice, setIsPointerDevice] = useState(false)
+  const firstName = user?.full_name ? user.full_name.split(' ')[0] : 'User'
 
   useEffect(() => {
     const media = window.matchMedia('(pointer: fine)')
@@ -60,19 +61,20 @@ export function TopBar({ variant = 'solid' }: TopBarProps) {
               <span className="text-slate-400">Validating session...</span>
             ) : isAuthenticated ? (
               <div className="relative">
-                <div className="flex items-center gap-1.5 rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-cyan-900/30 px-4 py-2 text-sm font-semibold tracking-wide text-cyan-100 transition hover:border-cyan-300 hover:text-white">
-                  <span className="inline-flex h-5 w-5 items-start justify-start">
-                    <span className="inline-block h-3 w-3 border-t-2 border-l-2 border-cyan-200" />
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setMenuOpen((prev) => !prev)}
-                    className="flex items-center gap-1.5"
-                  >
-                    <span>Hello, {user?.full_name ?? 'User'}</span>
-                    <span className="inline-flex h-5 w-5 items-center justify-center">
-                      <span
-                        className={`inline-block h-3 w-3 border-b-2 border-r-2 border-cyan-200 transition-transform ${
+              <div className="flex items-center gap-1.5 rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-cyan-900/30 px-4 py-2 text-sm font-semibold tracking-wide text-cyan-100 transition hover:border-cyan-300 hover:text-white">
+                <span className="inline-flex h-5 w-5 items-start justify-start">
+                  <span className="inline-block h-3 w-3 border-t-2 border-l-2 border-cyan-200" />
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-1.5"
+                >
+                  <span className="sm:hidden">Hi, {firstName}</span>
+                  <span className="hidden sm:inline">Hello, {user?.full_name ?? 'User'}</span>
+                  <span className="inline-flex h-5 w-5 items-center justify-center">
+                    <span
+                      className={`inline-block h-3 w-3 border-b-2 border-r-2 border-cyan-200 transition-transform ${
                           menuOpen ? 'rotate-45' : '-rotate-135'
                         }`}
                       />

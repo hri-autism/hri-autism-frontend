@@ -1,6 +1,43 @@
 import { useCallback, useEffect, useState } from 'react'
 import { request } from '../lib/api'
 
+const CHILDREN_CACHE_KEY = 'children_cache_v1'
+const CHILDREN_TTL = 40_000 // 40 seconds
+
+type ChildrenCache = {
+  ts: number
+  data: ChildListItem[]
+}
+
+const readChildrenCache = (): ChildrenCache | null => {
+  try {
+    const raw = localStorage.getItem(CHILDREN_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as ChildrenCache
+    if (!parsed?.ts || !Array.isArray(parsed.data)) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+const writeChildrenCache = (data: ChildListItem[]) => {
+  try {
+    const payload: ChildrenCache = { ts: Date.now(), data }
+    localStorage.setItem(CHILDREN_CACHE_KEY, JSON.stringify(payload))
+  } catch {
+    /* ignore cache errors */
+  }
+}
+
+const clearChildrenCache = () => {
+  try {
+    localStorage.removeItem(CHILDREN_CACHE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
 type CreateChildPayload = {
   nickname: string
   age: number
@@ -68,6 +105,7 @@ export function useChild(): UseChildResult {
         method: 'POST',
         body: payload,
       })
+      clearChildrenCache()
       return response
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
@@ -98,8 +136,18 @@ export function useChildrenList(autoFetch = true): UseChildrenListResult {
     setIsLoading(true)
     setError(null)
     try {
+      const cached = readChildrenCache()
+      const now = Date.now()
+      if (cached && now - cached.ts < CHILDREN_TTL) {
+        setChildren(cached.data)
+        setHasLoaded(true)
+        setIsLoading(false)
+        return
+      }
+
       const data = await request<ChildrenListResponse>('/api/children')
       setChildren(Array.isArray(data.children) ? data.children : [])
+      writeChildrenCache(Array.isArray(data.children) ? data.children : [])
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load children.'
       setError(message)

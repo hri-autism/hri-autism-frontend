@@ -13,6 +13,8 @@ import {
   buttonClasses,
   Tag,
 } from '../components/ui'
+import { TopBar } from '../components/layout/TopBar'
+import { heroBackgroundStyles } from '../components/ui/RobotIllustration'
 
 type LatestSession = {
   session_id: string
@@ -99,6 +101,20 @@ const humanize = (value: string) =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ')
 
+const communicationLabel = (value: string) => {
+  const lower = value.toLowerCase()
+  if (lower === 'medium') return 'med'
+  if (lower === 'high') return 'articulate'
+  if (lower === 'low') return 'inarticulate'
+  return humanize(value)
+}
+
+const shortMood = (value: string) => {
+  const lower = value.toLowerCase()
+  if (lower === 'uncomfortable') return 'Uncomfort'
+  return humanize(value)
+}
+
 const promptPreviewComponents = {
   p: ({ node, ...props }: any) => <p className="mb-2 last:mb-0 text-slate-100" {...props} />,
   strong: ({ node, ...props }: any) => <strong className="text-cyan-200" {...props} />,
@@ -137,6 +153,15 @@ const promptPreviewComponents = {
             }).format(new Date(latest.created_at))
           : null
 
+      const createdAtMobileDisplay =
+        latest?.created_at
+          ? new Intl.DateTimeFormat('en-GB', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+              hour12: false,
+            }).format(new Date(latest.created_at))
+          : null
+
       const parseList = (value?: string) => {
         if (!value) return 'None recorded yet'
         const items = value
@@ -156,9 +181,29 @@ const promptPreviewComponents = {
             </div>
             <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">
               <div className="space-y-4 text-sm text-slate-100">
-                <div className="space-y-1">
-                  <Tag variant="baseline" className="text-[10px]">
-                    {child.comm_level} communication · {child.personality} personality
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start md:hidden">
+                  <Tag
+                    variant="baseline"
+                    className="text-[11px] leading-tight px-2 py-0.5 max-w-[220px] border-purple-400/30 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-blue-500/10 text-purple-100 text-center justify-center"
+                  >
+                    {communicationLabel(child.comm_level)}
+                    {['medium'].includes(child.comm_level.toLowerCase()) ? ' communication' : ''}
+                  </Tag>
+                  <Tag
+                    variant="baseline"
+                    className="text-[11px] leading-tight px-2 py-0.5 max-w-[220px] border-cyan-400/30 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 text-cyan-100 text-center justify-center"
+                  >
+                    {child.personality} personality
+                  </Tag>
+                </div>
+                <div className="hidden md:flex">
+                  <Tag
+                    variant="baseline"
+                    className="w-full max-w-[410px] justify-center text-center text-[11px] leading-tight px-3 py-1 border-purple-400/30 bg-gradient-to-r from-purple-500/12 via-cyan-500/10 to-blue-500/12 text-purple-100"
+                  >
+                    {communicationLabel(child.comm_level)}
+                    {['medium'].includes(child.comm_level.toLowerCase()) ? ' communication' : ''} ·{' '}
+                    {child.personality} personality
                   </Tag>
                 </div>
                 <div>
@@ -190,23 +235,30 @@ const promptPreviewComponents = {
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <div className="flex items-center justify-between">
                     <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                      Latest session
+                      <span className="md:hidden">Latest</span>
+                      <span className="hidden md:inline">Latest session</span>
                     </p>
                     {createdAtDisplay ? (
-                      <span className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                        {createdAtDisplay}
-                      </span>
+                      <>
+                        <span className="text-xs uppercase tracking-[0.3em] text-slate-400 md:hidden">
+                          {createdAtMobileDisplay}
+                        </span>
+                        <span className="hidden text-xs uppercase tracking-[0.3em] text-slate-400 md:inline">
+                          {createdAtDisplay}
+                        </span>
+                      </>
                     ) : null}
                  </div>
                   {latestLoading ? (
                     <p className="text-sm text-slate-200">Loading latest session...</p>
                   ) : latestError ? (
                     <p className="text-sm text-rose-300">{latestError}</p>
-                  ) : latest ? (
+                    ) : latest ? (
                     <div className="space-y-4">
-                      <div className="mt-3 mb-1 flex flex-wrap gap-1 md:gap-2 text-[11px] md:text-xs">
+                      <div className="mt-3 mb-1 grid grid-cols-2 gap-2 text-[11px] md:flex md:flex-wrap md:gap-2 md:text-xs">
                         <Tag variant="mood" className="text-[11px] md:text-xs">
-                          Mood: {humanize(latest.mood)}
+                          <span className="md:hidden">Mood: {shortMood(latest.mood)}</span>
+                          <span className="hidden md:inline">Mood: {humanize(latest.mood)}</span>
                         </Tag>
                         {environmentChips.map((chip) => (
                           <Tag
@@ -238,9 +290,12 @@ const promptPreviewComponents = {
                         <p className="text-xs text-slate-400">No situation recorded.</p>
                       )}
                     </div>
-                  ) : (
+                    ) : (
                     <p className="text-sm text-slate-300">
-                      No sessions yet. Create one to populate this area.
+                      <span className="md:hidden">No sessions yet. Start one now.</span>
+                      <span className="hidden md:inline">
+                        No sessions yet. Create one to populate this area.
+                      </span>
                     </p>
                   )}
                 </div>
@@ -251,7 +306,7 @@ const promptPreviewComponents = {
                 Session prompt
               </p>
               <p className="text-[11px] text-slate-400">
-                Hover to expand. Scroll inside to read the full prompt.
+                Hover to expand. Scroll inside to read full prompt.
               </p>
               {latest?.prompt ? (
                 <div className="group relative mt-2 rounded-xl border border-slate-800/60 bg-slate-900/70 p-3">
@@ -315,7 +370,14 @@ const promptPreviewComponents = {
         <Card
           tone="dark"
           title={`Welcome back, ${user.full_name.split(' ')[0] ?? user.full_name} !`}
-          description="Here’s a quick overview of your profiles and sessions."
+          description={
+            <>
+              <span className="md:hidden">Quick overview of your profiles and sessions.</span>
+              <span className="hidden md:inline">
+                Here’s a quick overview of your profiles and sessions.
+              </span>
+            </>
+          }
         >
           <div className="grid gap-6 text-sm text-slate-200 md:grid-cols-3">
             <div>
@@ -343,21 +405,27 @@ const promptPreviewComponents = {
         </Card>
 
         {childrenLoading ? (
-          <StatusBanner variant="loading">Loading child profiles...</StatusBanner>
+          <StatusBanner variant="loading">
+            <span className="md:hidden">Loading profiles...</span>
+            <span className="hidden md:inline">Loading child profiles...</span>
+          </StatusBanner>
         ) : childrenError ? (
           <StatusBanner variant="error">{childrenError}</StatusBanner>
         ) : children.length > 0 ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">My children</h2>
+                <h2 className="text-xl font-semibold text-white">My Children</h2>
                 <p className="text-sm text-slate-400">
-                  Select a child to view or create sessions.
+                  <span className="md:hidden">View a child or create sessions.</span>
+                  <span className="hidden md:inline">
+                    Select a child to view or create sessions.
+                  </span>
                 </p>
               </div>
               <Link
                 to="/child/new"
-                className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-cyan-100 transition hover:border-cyan-300 hover:text-white sm:px-6 sm:text-sm sm:tracking-[0.3em]"
+                className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-cyan-100 transition hover:border-cyan-300 hover:text-white sm:px-6 sm:text-sm sm:tracking-[0.3em]"
               >
                 Add child
               </Link>
@@ -389,23 +457,37 @@ const promptPreviewComponents = {
   ])
 
   return (
-    <PageContainer variant="dark" contentClassName="space-y-10">
-      <div className="flex items-center justify-between">
-        <SectionHeader
-          tone="dark"
-          title="Dashboard"
-          description="Manage your child profiles and sessions."
-        />
-        <Link
-          to="/"
-          className="rounded-2xl border border-cyan-400/40 bg-slate-900/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-cyan-100 transition hover:border-cyan-300 hover:text-white sm:px-6 sm:text-sm sm:tracking-[0.3em]"
+    <section className={`${heroBackgroundStyles} overflow-visible min-h-screen`}>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-1/3 -top-1/4 h-[60vh] w-[60vw] rounded-full bg-gradient-to-br from-cyan-400/40 via-purple-500/30 to-blue-500/40 blur-3xl" />
+        <div className="absolute right-[-10%] top-1/3 h-[50vh] w-[40vw] rounded-full bg-gradient-to-br from-blue-500/40 to-purple-500/40 blur-3xl" />
+      </div>
+      <div className="relative z-10">
+        <TopBar variant="transparent" />
+        <PageContainer
+          variant="dark"
+          className="bg-transparent text-white"
+          contentClassName="space-y-10"
         >
-          <span className="sm:hidden">Back</span>
-          <span className="hidden sm:inline">Back to home</span>
-        </Link>
-     </div>
-      {content}
-    </PageContainer>
+          <SectionHeader
+            tone="dark"
+            align="center"
+            titleClassName="text-4xl md:text-5xl"
+            descriptionClassName="text-base md:text-lg"
+            title={
+              <>
+                My{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400">
+                  Dashboard
+                </span>
+              </>
+            }
+            description="Manage your child profiles and sessions."
+          />
+          {content}
+        </PageContainer>
+      </div>
+    </section>
   )
 }
 
